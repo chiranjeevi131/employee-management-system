@@ -1,0 +1,424 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | EMS</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            background: #F4F7FC;
+            color: #1E293B;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background: #14213D;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 28px 18px;
+            color: white;
+        }
+
+        .logo {
+            font-size: 23px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .logo span {
+            color: #60A5FA;
+        }
+
+        .nav-title {
+            font-size: 11px;
+            color: #94A3B8;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin: 20px 12px 12px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 13px 15px;
+            margin-bottom: 8px;
+            color: #CBD5E1;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #2563EB;
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            padding: 35px;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 27px;
+            color: #14213D;
+            margin-bottom: 7px;
+        }
+
+        .page-header p {
+            color: #64748B;
+            font-size: 14px;
+        }
+
+        /* Profile Card */
+        .profile-card {
+            max-width: 800px;
+            background: white;
+            border-radius: 14px;
+            padding: 32px;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding-bottom: 28px;
+            border-bottom: 1px solid #E2E8F0;
+            margin-bottom: 28px;
+        }
+
+        .avatar {
+            width: 78px;
+            height: 78px;
+            background: #DBEAFE;
+            color: #2563EB;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .profile-header h2 {
+            font-size: 21px;
+            color: #14213D;
+            margin-bottom: 7px;
+        }
+
+        .profile-header p {
+            color: #64748B;
+            font-size: 13px;
+        }
+
+        .section-title {
+            color: #14213D;
+            font-size: 16px;
+            margin-bottom: 18px;
+        }
+
+        /* Details */
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .detail-box {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 9px;
+            padding: 17px;
+        }
+
+        .detail-label {
+            display: block;
+            color: #64748B;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 9px;
+        }
+
+        .detail-value {
+            display: block;
+            color: #1E293B;
+            font-size: 15px;
+            font-weight: 600;
+            overflow-wrap: anywhere;
+        }
+
+        .role-badge {
+            display: inline-block;
+            background: #DCFCE7;
+            color: #15803D;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid #E2E8F0;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .primary-btn {
+            background: #2563EB;
+            color: white;
+        }
+
+        .primary-btn:hover {
+            background: #1D4ED8;
+        }
+
+        .secondary-btn {
+            background: #F1F5F9;
+            color: #475569;
+        }
+
+        .secondary-btn:hover {
+            background: #E2E8F0;
+        }
+
+        .footer {
+            text-align: center;
+            color: #94A3B8;
+            font-size: 12px;
+            margin-top: 28px;
+        }
+		
+		.logout-btn {
+		    width: 100%;
+		    border: none;
+		    text-align: left;
+		    background: transparent;
+		    cursor: pointer;
+		    font-size: 14px;
+		}
+
+		.logout-btn:hover {
+		    background: #2563EB;
+		    color: white;
+		}
+		
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding: 18px;
+            }
+
+            .logo {
+                margin-bottom: 15px;
+            }
+
+            .nav-title {
+                display: none;
+            }
+
+            .nav-link {
+                display: inline-block;
+                margin: 3px;
+                padding: 10px;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px 14px;
+            }
+
+            .profile-card {
+                padding: 22px;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+
+    <div class="logo">Employee<span>MS</span></div>
+
+    <div class="nav-title">Main Menu</div>
+
+    <a th:href="@{/dashboard}" class="nav-link">
+        Dashboard
+    </a>
+
+    <a th:href="@{/employees}" class="nav-link">
+        Employees
+    </a>
+
+    <a th:href="@{/departments}" class="nav-link">
+        Departments
+    </a>
+
+    <div class="nav-title">Account</div>
+
+    <a th:href="@{/profile}" class="nav-link active">
+        My Profile
+    </a>
+	
+	<a th:href="@{/change-password}" class="nav-link">
+	    🔒 Change Password
+	</a>
+	
+	<form th:action="@{/logout}" method="post">
+	    <button type="submit" class="nav-link logout-btn">
+	        Logout
+	    </button>
+	</form>
+
+</aside>
+
+<!-- Main Content -->
+<main class="main-content">
+
+    <div class="page-header">
+        <h1>My Profile</h1>
+        <p>View your account information and profile details.</p>
+    </div>
+
+    <section class="profile-card">
+
+        <!-- Profile Header -->
+        <div class="profile-header">
+
+            <div class="avatar">
+                <span th:text="${#strings.substring(user.username, 0, 1).toUpperCase()}">A</span>
+            </div>
+
+            <div>
+                <h2 th:text="${user.username}">Admin</h2>
+                <p>Employee Management System Account</p>
+            </div>
+
+        </div>
+
+        <h3 class="section-title">Account Information</h3>
+
+        <div class="details-grid">
+
+            <div class="detail-box">
+
+                <span class="detail-label">Username</span>
+
+                <span class="detail-value"
+                      th:text="${user.username}">
+                    Admin
+                </span>
+
+            </div>
+
+            <div class="detail-box">
+
+                <span class="detail-label">Email Address</span>
+
+                <span class="detail-value"
+                      th:text="${user.email}">
+                    admin@example.com
+                </span>
+
+            </div>
+
+            <div class="detail-box">
+
+                <span class="detail-label">Account Role</span>
+
+                <span class="role-badge"
+                      th:text="${user.role}">
+                    ADMIN
+                </span>
+
+            </div>
+
+            <div class="detail-box">
+
+                <span class="detail-label">Account Status</span>
+
+                <span class="detail-value">Active</span>
+
+            </div>
+
+        </div>
+
+        <!-- Actions -->
+        <div class="button-group">
+
+			<a th:href="@{/profile/edit}"
+			   class="btn primary-btn">
+			    ✏️ Edit Profile
+			</a>
+			
+            <a th:href="@{/dashboard}"
+               class="btn secondary-btn">
+                Back to Dashboard
+            </a>
+
+        </div>
+
+    </section>
+
+    <div class="footer">
+        Employee Management System &copy; 2026
+    </div>
+
+</main>
+
+</body>
+</html>

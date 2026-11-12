@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EMS | Audit Logs</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+		body {
+		    font-family: Arial, sans-serif;
+		    background: #f1f5f9;
+		    padding: 0;
+		}
+
+		.sidebar {
+		    width: 245px;
+		    height: 100vh;
+		    position: fixed;
+		    top: 0;
+		    left: 0;
+		    background: #14213d;
+		    padding: 25px 18px;
+		    color: white;
+		    overflow-y: auto;
+		    z-index: 1000;
+		}
+
+		.brand {
+		    font-size: 24px;
+		    font-weight: 800;
+		    margin-bottom: 40px;
+		}
+
+		.menu-label {
+		    color: #94a3b8;
+		    font-size: 11px;
+		    margin-bottom: 15px;
+		    margin-top: 20px;
+		}
+
+		.sidebar a {
+		    display: block;
+		    padding: 13px 15px;
+		    margin-bottom: 8px;
+		    color: #cbd5e1;
+		    text-decoration: none;
+		    border-radius: 8px;
+		    font-size: 14px;
+		}
+
+		.sidebar a:hover,
+		.sidebar a.active {
+		    background: #2563eb;
+		    color: white;
+		}
+
+		.sidebar-logout {
+		    display: block;
+		    width: 100%;
+		    padding: 13px 15px;
+		    margin-bottom: 8px;
+		    background: transparent;
+		    color: #cbd5e1;
+		    border: none;
+		    border-radius: 8px;
+		    text-align: left;
+		    font-size: 14px;
+		    cursor: pointer;
+		}
+
+		.sidebar-logout:hover {
+		    background: #dc2626;
+		    color: white;
+		}
+
+		.sidebar-footer {
+		    position: static;
+		    margin-top: 25px;
+		    padding-top: 18px;
+		    border-top: 1px solid #334155;
+		    color: #94a3b8;
+		    font-size: 12px;
+		    text-align: center;
+		}
+
+		.container {
+		    max-width: 1200px;
+		    margin: 0 auto 0 245px;
+		    padding: 30px;
+		}
+
+
+        .header {
+            background: #1e293b;
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #cbd5e1;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 18px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        /* FILTER CONTAINER */
+
+        .filter-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .filter-container input,
+        .filter-container select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .filter-container label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-container button {
+            padding: 10px 18px;
+            background: #34495e;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .filter-container button:hover {
+            background: #1e293b;
+        }
+
+        /* TABLE */
+
+        .table-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th, td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #2563eb;
+            color: white;
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        /* ACTION BADGES */
+
+        .action {
+            padding: 6px 12px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .CREATE {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .UPDATE {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .DELETE {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        /* RECORD COUNTER */
+
+        .record-count {
+            font-weight: 600;
+            color: #34495e;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 30px;
+            color: #64748b;
+        }
+
+		@media(max-width: 768px) {
+
+		    .sidebar {
+		        display: none;
+		    }
+
+		    .container {
+		        margin-left: 0;
+		        padding: 15px;
+		    }
+
+		    .filter-container {
+		        flex-direction: column;
+		        align-items: stretch;
+		    }
+
+		    .filter-container input,
+		    .filter-container select {
+		        width: 100%;
+		    }
+
+		}
+		/* AUDIT LOG PAGINATION */
+
+		.pagination-container {
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: center;
+		    flex-wrap: wrap;
+		    gap: 15px;
+		    margin-top: 20px;
+		    padding: 15px;
+		    background: #f8fafc;
+		    border-radius: 8px;
+		}
+
+		.pagination-info {
+		    color: #475569;
+		    font-size: 14px;
+		}
+
+		.pagination-controls {
+		    display: flex;
+		    align-items: center;
+		    flex-wrap: wrap;
+		    gap: 12px;
+		}
+
+		.pagination-controls select {
+		    padding: 8px;
+		    border: 1px solid #cbd5e1;
+		    border-radius: 5px;
+		}
+
+		.pagination-controls button {
+		    padding: 9px 15px;
+		    background: #2563eb;
+		    color: white;
+		    border: none;
+		    border-radius: 5px;
+		    cursor: pointer;
+		}
+
+		.pagination-controls button:disabled {
+		    background: #94a3b8;
+		    cursor: not-allowed;
+		}
+		/* AUDIT LOG COLUMN SORTING */
+
+		th.sortable {
+		    cursor: pointer;
+		    user-select: none;
+		    transition: background 0.2s ease;
+		}
+
+		th.sortable:hover {
+		    background: #dbeafe;
+		}
+
+		th.sortable.active {
+		    color: #ffffff;
+		}
+    </style>
+	
+	
+	<!-- jsPDF Library -->
+	<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+	<!-- jsPDF AutoTable Plugin -->
+	<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+	
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+    <div class="brand">EMS</div>
+
+    <div class="menu-label">MAIN MENU</div>
+
+    <a th:href="@{/dashboard}">
+        ▦ Dashboard
+    </a>
+
+    <a th:href="@{/employees}">
+        👥 Employees
+    </a>
+
+    <a th:href="@{/departments}">
+        ▤ Departments
+    </a>
+
+    <a th:href="@{/attendance}">
+        📅 Attendance
+    </a>
+
+    <a th:href="@{/attendance/reports}">
+        📊 Attendance Reports
+    </a>
+
+    <a th:href="@{/audit-logs}" class="active">
+        📋 Audit Logs
+    </a>
+
+    <a th:href="@{/admin/create-hr}"
+       sec:authorize="hasRole('ADMIN')">
+        👤 Create HR Account
+    </a>
+
+    <div class="menu-label">ACCOUNT</div>
+
+    <a th:href="@{/profile}">
+        👤 My Profile
+    </a>
+
+    <form th:action="@{/logout}" method="post">
+        <button type="submit" class="sidebar-logout">
+            ↪ Logout
+        </button>
+    </form>
+
+    <div class="sidebar-footer">
+        Employee Management System<br>
+        © 2026 EMS
+    </div>
+
+</div>
+
+<div class="container">
+	
+	
+	<a th:href="@{/dashboard}" class="back-btn">
+	       ← Back to Dashboard
+	   </a>
+	
+
+    <div class="header">
+
+        <h1>Employee Activity Logs</h1>
+
+        <p>Track all employee management activities.</p>
+
+    </div>
+
+    <!-- AUDIT LOG SEARCH AND FILTERS -->
+
+    <div class="filter-container">
+
+        <input type="text"
+               id="searchAuditLogs"
+               placeholder="Search employee, username or details...">
+
+        <select id="actionFilter">
+
+            <option value="">All Actions</option>
+
+            <option value="CREATE">Create</option>
+
+            <option value="UPDATE">Update</option>
+
+            <option value="DELETE">Delete</option>
+
+        </select>
+
+        <label>
+            From:
+            <input type="date" id="fromDate">
+        </label>
+
+        <label>
+            To:
+            <input type="date" id="toDate">
+        </label>
+
+        <button type="button" id="resetFilters">
+            Reset
+        </button>
+		<button type="button" id="exportAuditLogs"
+		        style="background: #16a34a;">
+		    ⬇ Export CSV
+		</button>
+		<button type="button" id="exportAuditPDF"
+		        style="background: #dc2626;">
+		    ⬇ Export PDF
+		</button>
+
+    </div>
+
+    <div class="table-container">
+
+        <!-- RECORD COUNTER -->
+
+        <p id="auditLogCount" class="record-count">
+            Matching Records: 0
+        </p>
+
+        <table>
+
+			<thead>
+			    <tr>
+			        <th class="sortable" data-column="0">ID ↕</th>
+			        <th class="sortable" data-column="1">Action ↕</th>
+			        <th class="sortable" data-column="2">Entity ↕</th>
+			        <th class="sortable" data-column="3">Employee ID ↕</th>
+			        <th class="sortable" data-column="4">Performed By ↕</th>
+			        <th>Details</th>
+			        <th class="sortable" data-column="6">Date & Time ↕</th>
+			    </tr>
+			</thead>
+
+            <tbody>
+
+                <tr class="audit-log-row"
+                    th:each="log : ${auditLogs}">
+
+                    <td th:text="${log.id}"></td>
+
+                    <td>
+                        <span class="action"
+                              th:classappend="${log.action}"
+                              th:text="${log.action}">
+                        </span>
+                    </td>
+
+                    <td th:text="${log.entityType}"></td>
+
+                    <td th:text="${log.entityId}"></td>
+
+                    <td th:text="${log.performedBy}"></td>
+
+                    <td th:text="${log.details}"></td>
+
+                    <td th:text="${log.createdAt}"></td>
+
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(auditLogs)}">
+
+                    <td colspan="7" class="empty-message">
+                        No activity logs found.
+                    </td>
+
+                </tr>
+
+                <tr id="noMatchingLogs" style="display: none;">
+
+                    <td colspan="7" class="empty-message">
+                        No matching audit logs found.
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+			    </table>
+
+			    <!-- AUDIT LOG PAGINATION -->
+
+			    <div class="pagination-container" id="paginationContainer">
+
+			        <div class="pagination-info">
+			            Showing <span id="startRecord">0</span>
+			            to <span id="endRecord">0</span>
+			            of <span id="totalRecords">0</span> records
+			        </div>
+
+			        <div class="pagination-controls">
+
+			            <label>
+			                Records per page:
+
+			                <select id="recordsPerPage">
+			                    <option value="10">10</option>
+			                    <option value="25">25</option>
+			                    <option value="50">50</option>
+			                </select>
+			            </label>
+
+			            <button type="button" id="prevPage">
+			                Previous
+			            </button>
+
+			            <span id="currentPage">Page 1</span>
+
+			            <button type="button" id="nextPage">
+			                Next
+			            </button>
+
+			        </div>
+
+			    </div>
+
+			</div>
+
+</div>
+
+
+<!-- AUDIT LOG FILTER JAVASCRIPT -->
+
+<script>
+
+    const searchInput =
+        document.getElementById("searchAuditLogs");
+
+    const actionFilter =
+        document.getElementById("actionFilter");
+
+    const fromDate =
+        document.getElementById("fromDate");
+
+    const toDate =
+        document.getElementById("toDate");
+
+    const resetButton =
+        document.getElementById("resetFilters");
+
+    const countDisplay =
+        document.getElementById("auditLogCount");
+
+    const noMatchingLogs =
+        document.getElementById("noMatchingLogs");
+
+
+		let currentPage = 1;
+		
+		// AUDIT LOG SORTING
+
+		let sortColumn = null;
+		let sortDirection = "asc";
+
+		function sortAuditLogs(columnIndex) {
+
+		    const tbody = document.querySelector("tbody");
+
+		    const rows = Array.from(
+		        document.querySelectorAll(".audit-log-row")
+		    );
+
+		    // Toggle sorting direction
+		    if (sortColumn === columnIndex) {
+		        sortDirection = sortDirection === "asc" ? "desc" : "asc";
+		    } else {
+		        sortColumn = columnIndex;
+		        sortDirection = "asc";
+		    }
+			
+			// UPDATE SORTING INDICATORS
+
+			const columnLabels = {
+			    0: "ID",
+			    1: "Action",
+			    2: "Entity",
+			    3: "Employee ID",
+			    4: "Performed By",
+			    6: "Date & Time"
+			};
+
+			document.querySelectorAll("th.sortable").forEach(header => {
+
+			    const column = parseInt(header.dataset.column);
+
+			    const label = columnLabels[column];
+
+			    if (column === sortColumn) {
+
+			        header.textContent =
+			            label + (sortDirection === "asc" ? " ↑" : " ↓");
+
+			        header.classList.add("active");
+
+			    } else {
+
+			        header.textContent = label + " ↕";
+
+			        header.classList.remove("active");
+
+			    }
+
+			});
+
+		    // Sort table rows
+		    rows.sort((a, b) => {
+
+		        let valueA = a.cells[columnIndex].innerText.trim();
+		        let valueB = b.cells[columnIndex].innerText.trim();
+
+		        if (columnIndex === 0 || columnIndex === 3) {
+
+		            valueA = Number(valueA) || 0;
+		            valueB = Number(valueB) || 0;
+
+		        } else if (columnIndex === 6) {
+
+		            valueA = new Date(valueA).getTime();
+		            valueB = new Date(valueB).getTime();
+
+		            if (isNaN(valueA)) valueA = 0;
+		            if (isNaN(valueB)) valueB = 0;
+
+		        } else {
+
+		            valueA = valueA.toLowerCase();
+		            valueB = valueB.toLowerCase();
+
+		        }
+
+		        let result;
+
+		        if (typeof valueA === "number") {
+		            result = valueA - valueB;
+		        } else {
+		            result = valueA.localeCompare(valueB);
+		        }
+
+		        return sortDirection === "asc" ? result : -result;
+
+		    });
+
+		    // Reorder rows in the table
+		    rows.forEach(row => tbody.appendChild(row));
+
+		    // Refresh filters and pagination
+		    filterAuditLogs();
+
+		}
+
+		function filterAuditLogs() {
+
+		    const searchValue =
+		        searchInput.value.toLowerCase().trim();
+
+		    const actionValue = actionFilter.value;
+		    const fromValue = fromDate.value;
+		    const toValue = toDate.value;
+
+		    const rows = document.querySelectorAll(".audit-log-row");
+
+		    let filteredRows = [];
+
+		    rows.forEach(row => {
+
+		        const rowText = row.innerText.toLowerCase();
+		        const action = row.cells[1].innerText.trim();
+		        const dateText = row.cells[6].innerText.trim();
+		        const logDate = dateText.substring(0, 10);
+
+		        const matchesSearch = rowText.includes(searchValue);
+		        const matchesAction = !actionValue || action === actionValue;
+		        const matchesFromDate = !fromValue || logDate >= fromValue;
+		        const matchesToDate = !toValue || logDate <= toValue;
+
+		        const isMatch =
+		            matchesSearch &&
+		            matchesAction &&
+		            matchesFromDate &&
+		            matchesToDate;
+
+		        row.dataset.matchesFilter = isMatch ? "true" : "false";
+
+		        if (isMatch) {
+		            filteredRows.push(row);
+		        }
+
+		        row.style.display = "none";
+
+		    });
+
+		    // UPDATE MATCHING RECORD COUNT
+
+		    countDisplay.textContent =
+		        "Matching Records: " + filteredRows.length;
+
+		    // RESET TO FIRST PAGE AFTER FILTERING
+
+		    currentPage = 1;
+
+		    // UPDATE PAGINATION
+
+		    updatePagination(filteredRows);
+
+		    // SHOW NO MATCHING RECORDS MESSAGE
+
+		    noMatchingLogs.style.display =
+		        rows.length > 0 && filteredRows.length === 0
+		            ? ""
+		            : "none";
+		}
+		
+		function updatePagination(filteredRows) {
+
+		    const recordsPerPage =
+		        parseInt(document.getElementById("recordsPerPage").value);
+
+		    const totalRecords = filteredRows.length;
+
+		    const totalPages = Math.ceil(totalRecords / recordsPerPage);
+
+		    if (totalPages > 0 && currentPage > totalPages) {
+		        currentPage = totalPages;
+		    }
+
+		    const startIndex = (currentPage - 1) * recordsPerPage;
+
+		    const endIndex = Math.min(
+		        startIndex + recordsPerPage,
+		        totalRecords
+		    );
+
+		    // DISPLAY CURRENT PAGE RECORDS
+
+		    filteredRows.forEach((row, index) => {
+
+		        row.style.display =
+		            index >= startIndex && index < endIndex
+		                ? ""
+		                : "none";
+
+		    });
+
+		    // UPDATE RECORD INFORMATION
+
+		    document.getElementById("startRecord").textContent =
+		        totalRecords === 0 ? 0 : startIndex + 1;
+
+		    document.getElementById("endRecord").textContent =
+		        endIndex;
+
+		    document.getElementById("totalRecords").textContent =
+		        totalRecords;
+
+		    document.getElementById("currentPage").textContent =
+		        "Page " + (totalRecords === 0 ? 0 : currentPage)
+		        + " of " + totalPages;
+
+		    // ENABLE / DISABLE BUTTONS
+
+		    document.getElementById("prevPage").disabled =
+		        currentPage <= 1;
+
+		    document.getElementById("nextPage").disabled =
+		        currentPage >= totalPages;
+
+		}
+
+    // SEARCH EVENT
+
+    searchInput.addEventListener(
+        "input",
+        filterAuditLogs
+    );
+
+
+    // ACTION FILTER EVENT
+
+    actionFilter.addEventListener(
+        "change",
+        filterAuditLogs
+    );
+
+
+    // DATE FILTER EVENTS
+
+    fromDate.addEventListener(
+        "change",
+        filterAuditLogs
+    );
+
+    toDate.addEventListener(
+        "change",
+        filterAuditLogs
+    );
+
+
+    // RESET FILTERS
+
+    resetButton.addEventListener("click", function() {
+
+        searchInput.value = "";
+
+        actionFilter.value = "";
+
+        fromDate.value = "";
+
+        toDate.value = "";
+
+        filterAuditLogs();
+
+    });
+
+	// RECORDS PER PAGE
+
+	document.getElementById("recordsPerPage")
+	    .addEventListener("change", function() {
+
+	        currentPage = 1;
+
+	        filterAuditLogs();
+
+	    });
+
+
+	// PREVIOUS PAGE
+
+	document.getElementById("prevPage")
+	    .addEventListener("click", function() {
+
+	        if (currentPage > 1) {
+
+	            currentPage--;
+
+	            const rows = Array.from(
+	                document.querySelectorAll(".audit-log-row")
+	            ).filter(row =>
+	                row.dataset.matchesFilter === "true"
+	            );
+
+	            updatePagination(rows);
+
+	        }
+
+	    });
+
+
+	// NEXT PAGE
+
+	document.getElementById("nextPage")
+	    .addEventListener("click", function() {
+
+	        const rows = Array.from(
+	            document.querySelectorAll(".audit-log-row")
+	        ).filter(row =>
+	            row.dataset.matchesFilter === "true"
+	        );
+
+	        const recordsPerPage =
+	            parseInt(document.getElementById("recordsPerPage").value);
+
+	        const totalPages =
+	            Math.ceil(rows.length / recordsPerPage);
+
+	        if (currentPage < totalPages) {
+
+	            currentPage++;
+
+	            updatePagination(rows);
+
+	        }
+
+	    });
+		// CLICKABLE COLUMN SORTING
+
+		document.querySelectorAll("th.sortable").forEach(header => {
+
+		    header.addEventListener("click", function() {
+
+		        const columnIndex = parseInt(
+		            this.dataset.column
+		        );
+
+		        sortAuditLogs(columnIndex);
+
+		    });
+
+		});
+
+    // INITIAL RECORD COUNT
+
+    filterAuditLogs();
+	
+	// EXPORT FILTERED AUDIT LOGS TO CSV
+
+	document.getElementById("exportAuditLogs")
+	    .addEventListener("click", function() {
+
+	        const rows = document.querySelectorAll(".audit-log-row");
+
+	        let csvContent = [];
+
+	        // CSV HEADERS
+
+	        csvContent.push([
+	            "ID",
+	            "Action",
+	            "Entity",
+	            "Employee ID",
+	            "Performed By",
+	            "Details",
+	            "Date & Time"
+	        ]);
+
+	        let exportedCount = 0;
+
+	        // COLLECT VISIBLE ROWS ONLY
+
+	        rows.forEach(row => {
+
+	            if (row.dataset.matchesFilter === "true") {
+
+	                const rowData = Array.from(row.cells).map(cell => {
+
+	                    let value = cell.innerText.trim();
+
+	                    // Escape double quotes
+	                    value = value.replace(/"/g, '""');
+
+	                    return '"' + value + '"';
+
+	                });
+
+	                csvContent.push(rowData);
+
+	                exportedCount++;
+	            }
+
+	        });
+
+	        if (exportedCount === 0) {
+	            alert("No audit records available to export!");
+	            return;
+	        }
+
+	        // CONVERT DATA TO CSV
+
+	        const csvString = csvContent
+	            .map(row => row.join(","))
+	            .join("\r\n");
+
+	        // ADD UTF-8 BOM FOR EXCEL
+
+	        const blob = new Blob(
+	            ["\uFEFF" + csvString],
+	            { type: "text/csv;charset=utf-8;" }
+	        );
+
+	        // DOWNLOAD FILE
+
+	        const link = document.createElement("a");
+
+	        const url = URL.createObjectURL(blob);
+
+	        link.href = url;
+
+	        link.download = "EMS_Audit_Logs.csv";
+
+	        document.body.appendChild(link);
+
+	        link.click();
+
+	        document.body.removeChild(link);
+
+	        URL.revokeObjectURL(url);
+
+	        alert(exportedCount + " audit records exported successfully!");
+
+	    });
+		
+		// EXPORT FILTERED AUDIT LOGS TO PDF
+
+		document.getElementById("exportAuditPDF")
+		    .addEventListener("click", function() {
+
+		        const { jsPDF } = window.jspdf;
+
+		        const doc = new jsPDF("landscape");
+
+		        const rows = document.querySelectorAll(".audit-log-row");
+
+		        let tableData = [];
+
+		        // COLLECT VISIBLE RECORDS ONLY
+
+		        rows.forEach(row => {
+
+		            if (row.style.display !== "none") {
+
+		                const rowData = Array.from(row.cells).map(cell =>
+		                    cell.innerText.trim()
+		                );
+
+		                tableData.push(rowData);
+		            }
+
+		        });
+
+		        if (tableData.length === 0) {
+		            alert("No audit records available to export!");
+		            return;
+		        }
+
+		        // REPORT TITLE
+
+		        doc.setFontSize(20);
+
+		        doc.setTextColor(30, 41, 59);
+
+		        doc.text("Employee Activity Logs Report", 14, 18);
+
+		        // GENERATED DATE
+
+		        doc.setFontSize(10);
+
+		        doc.setTextColor(100, 100, 100);
+
+		        doc.text(
+		            "Generated On: " + new Date().toLocaleString(),
+		            14,
+		            27
+		        );
+
+		        // RECORD COUNT
+
+		        doc.setFontSize(12);
+
+		        doc.setTextColor(37, 99, 235);
+
+		        doc.text(
+		            "Total Matching Records: " + tableData.length,
+		            14,
+		            36
+		        );
+
+		        // AUDIT LOG TABLE
+
+		        doc.autoTable({
+
+		            startY: 43,
+
+					head: [ [
+					    "ID",
+					    "Action",
+					    "Entity",
+					    "Employee ID",
+					    "Performed By",
+					    "Details",
+					    "Date & Time"
+					] ],
+
+		            body: tableData,
+
+		            theme: "grid",
+
+		            styles: {
+		                fontSize: 8,
+		                cellPadding: 3,
+		                overflow: "linebreak"
+		            },
+
+		            headStyles: {
+		                fillColor: [37, 99, 235],
+		                textColor: 255,
+		                fontStyle: "bold"
+		            },
+
+		            alternateRowStyles: {
+		                fillColor: [241, 245, 249]
+		            },
+
+		            margin: {
+		                left: 14,
+		                right: 14
+		            }
+
+		        });
+
+		        // DOWNLOAD PDF
+
+		        doc.save("EMS_Audit_Logs_Report.pdf");
+
+		        alert(
+		            tableData.length +
+		            " audit records exported to PDF successfully!"
+		        );
+
+		    });
+</script>
+
+</body>
+
+</html>

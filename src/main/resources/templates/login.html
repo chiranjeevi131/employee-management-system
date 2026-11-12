@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Employee Portal | EMS</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f7faff;
+            padding: 30px;
+        }
+
+        .login-wrapper {
+            width: 100%;
+            max-width: 1150px;
+            min-height: 650px;
+            background: white;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 15px 50px rgba(35, 65, 110, 0.08);
+        }
+
+        /* LEFT LOGIN SECTION */
+
+        .login-section {
+            padding: 65px 70px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .logo {
+            width: 55px;
+            height: 55px;
+            background: #eaf2ff;
+            color: #2864c5;
+            border-radius: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 25px;
+        }
+
+        .login-section h1 {
+            font-size: 30px;
+            color: #263b59;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #8793a5;
+            font-size: 13px;
+            margin-bottom: 45px;
+        }
+
+        .form-group {
+            margin-bottom: 27px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #59677c;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .form-group input {
+            width: 100%;
+            height: 48px;
+            border: none;
+            border-bottom: 1.5px solid #cbd3df;
+            outline: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: 14px;
+            color: #263b59;
+            transition: 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: #4385ed;
+        }
+
+        .form-group input::placeholder {
+            color: #b0bac8;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            padding-right: 65px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 5px;
+            top: 14px;
+            border: none;
+            background: transparent;
+            color: #3979d5;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .login-button {
+            width: 100%;
+            height: 52px;
+            background: #4285ed;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 25px;
+            transition: 0.3s;
+        }
+
+        .login-button:hover {
+            background: #2868ca;
+            box-shadow: 0 7px 18px rgba(66, 133, 237, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 7px;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+
+        .error {
+            background: #fff0f0;
+            color: #c03939;
+            border: 1px solid #ffd5d5;
+        }
+
+        .success {
+            background: #edfff4;
+            color: #16834a;
+            border: 1px solid #c7f1d8;
+        }
+
+        .footer {
+            margin-top: 45px;
+            font-size: 11px;
+            color: #45546b;
+            text-align: center;
+        }
+
+        /* RIGHT ILLUSTRATION SECTION */
+
+        .illustration-section {
+            background: #f1f7ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .illustration-section::before {
+            content: "";
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: #e1edff;
+            border-radius: 50%;
+            top: -130px;
+            right: -100px;
+        }
+
+        .illustration-section img {
+            width: 100%;
+            max-width: 530px;
+            height: auto;
+            object-fit: contain;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* RESPONSIVE DESIGN */
+
+        @media (max-width: 850px) {
+            .login-wrapper {
+                grid-template-columns: 1fr;
+                max-width: 480px;
+            }
+
+			.illustration-section {
+			    display: flex;
+			    min-height: 220px;
+			    order: 1;
+			}
+
+			.login-section {
+			    order: 2;
+			}
+
+            .login-section {
+                padding: 55px 40px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+
+            .login-section {
+                padding: 40px 25px;
+            }
+
+            .login-section h1 {
+                font-size: 25px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div class="login-wrapper">
+
+        <!-- LEFT SIDE: LOGIN FORM -->
+
+        <div class="login-section">
+
+            <div class="logo">EMS</div>
+
+            <h1>Employee Portal</h1>
+
+            <p class="subtitle">
+                Welcome! Sign in to access your employee management system.
+            </p>
+
+            <div th:if="${param.error}" class="message error">
+                Invalid username or password. Please try again.
+            </div>
+
+            <div th:if="${param.logout}" class="message success">
+                You have been logged out successfully.
+            </div>
+
+            <form th:action="@{/login}" method="post">
+
+                <div class="form-group">
+
+                    <label for="username">Username</label>
+
+                    <input type="text"
+                           id="username"
+                           name="username"
+                           placeholder="Enter your username"
+                           required
+                           autofocus>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="password">Password</label>
+
+                    <div class="password-wrapper">
+
+                        <input type="password"
+                               id="password"
+                               name="password"
+                               placeholder="Enter your password"
+                               required>
+
+                        <button type="button"
+                                class="toggle-password"
+                                onclick="togglePassword()">
+                            Show
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <button type="submit" class="login-button">
+                    Sign In
+                </button>
+
+            </form>
+
+            <div class="footer">
+                © 2026 Employee Management System. All rights reserved.
+            </div>
+
+        </div>
+
+        <!-- RIGHT SIDE: EMPLOYEE ILLUSTRATION -->
+
+        <div class="illustration-section">
+
+            <img th:src="@{/images/ems-hr-illustration.jpg}"
+                 alt="Employee Management Illustration">
+
+        </div>
+
+    </div>
+
+    <script>
+
+        function togglePassword() {
+
+            const password = document.getElementById("password");
+            const button = document.querySelector(".toggle-password");
+
+            if (password.type === "password") {
+                password.type = "text";
+                button.textContent = "Hide";
+            } else {
+                password.type = "password";
+                button.textContent = "Show";
+            }
+
+        }
+
+    </script>
+
+</body>
+</html>

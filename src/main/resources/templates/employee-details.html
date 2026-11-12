@@ -1,0 +1,583 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Employee Details | EMS</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <style>
+        :root {
+            --sidebar: #14213D;
+            --primary: #2563EB;
+            --primary-hover: #1D4ED8;
+            --background: #F4F7FC;
+            --white: #FFFFFF;
+            --text: #1E293B;
+            --muted: #64748B;
+            --border: #E2E8F0;
+            --success: #16A34A;
+            --shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 245px;
+            background: var(--sidebar);
+            color: white;
+            padding: 28px 18px;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 12px;
+            margin-bottom: 45px;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            background: var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .brand h2 {
+            font-size: 21px;
+            letter-spacing: 1px;
+        }
+
+        .nav-label {
+            color: #94A3B8;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            padding: 0 13px;
+            margin-bottom: 15px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 13px 15px;
+            margin-bottom: 8px;
+            border-radius: 9px;
+            color: #CBD5E1;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #263B60;
+            color: white;
+        }
+
+        .nav-link.active {
+            border-left: 3px solid #60A5FA;
+        }
+
+        .nav-icon {
+            font-size: 18px;
+            width: 22px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 25px;
+            left: 18px;
+            right: 18px;
+            color: #94A3B8;
+            font-size: 12px;
+            text-align: center;
+            border-top: 1px solid #334155;
+            padding-top: 18px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 245px;
+            width: calc(100% - 245px);
+            padding: 30px 35px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            gap: 15px;
+        }
+
+        .page-heading h1 {
+            font-size: 27px;
+            font-weight: 800;
+            margin-bottom: 7px;
+        }
+
+        .page-heading p {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 11px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .back-btn:hover {
+            background: #F1F5F9;
+        }
+
+        /* Profile Card */
+        .profile-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            padding: 30px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 28px;
+        }
+
+        .profile-photo {
+            width: 125px;
+            height: 125px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #DBEAFE;
+            flex-shrink: 0;
+        }
+
+        .default-avatar {
+            width: 125px;
+            height: 125px;
+            border-radius: 50%;
+            background: #DBEAFE;
+            color: #1D4ED8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: 800;
+            border: 4px solid #BFDBFE;
+            flex-shrink: 0;
+        }
+
+        .profile-info h2 {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 9px;
+        }
+
+        .profile-info p {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 13px;
+        }
+
+        .employee-badge {
+            display: inline-block;
+            background: #DBEAFE;
+            color: #1D4ED8;
+            padding: 7px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* Details Section */
+        .details-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 28px;
+            box-shadow: var(--shadow);
+        }
+
+        .details-heading {
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 25px;
+        }
+
+        .details-heading h3 {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .details-heading p {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .section-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 17px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .section-label span {
+            color: var(--primary);
+            font-size: 17px;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 17px;
+        }
+
+        .detail-item {
+            background: #F8FAFC;
+            border: 1px solid #EEF2F7;
+            border-radius: 10px;
+            padding: 18px;
+            transition: 0.2s;
+        }
+
+        .detail-item:hover {
+            border-color: #BFDBFE;
+            background: #F5F9FF;
+        }
+
+        .detail-label {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 9px;
+            display: block;
+        }
+
+        .detail-value {
+            color: var(--text);
+            font-size: 14px;
+            font-weight: 700;
+            word-break: break-word;
+        }
+
+        .salary-value {
+            color: var(--success);
+            font-size: 17px;
+        }
+
+        /* Employment Section */
+        .employment-section {
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Bottom Actions */
+        .bottom-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .sidebar {
+                width: 75px;
+                padding: 25px 10px;
+            }
+
+            .brand {
+                justify-content: center;
+                padding: 0;
+            }
+
+            .brand h2,
+            .nav-label,
+            .nav-text,
+            .sidebar-footer {
+                display: none;
+            }
+
+            .nav-link {
+                justify-content: center;
+                padding: 14px 5px;
+            }
+
+            .main-content {
+                margin-left: 75px;
+                width: calc(100% - 75px);
+                padding: 25px 20px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .main-content {
+                padding: 18px 12px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .page-heading h1 {
+                font-size: 22px;
+            }
+
+            .profile-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 25px 15px;
+            }
+
+            .profile-info h2 {
+                font-size: 20px;
+            }
+
+            .details-card {
+                padding: 20px 15px;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">E</div>
+            <h2>EMS</h2>
+        </div>
+
+        <div class="nav-label">MAIN MENU</div>
+
+        <a th:href="@{/dashboard}" class="nav-link">
+            <span class="nav-icon">▦</span>
+            <span class="nav-text">Dashboard</span>
+        </a>
+
+        <a th:href="@{/employees}" class="nav-link active">
+            <span class="nav-icon">♙</span>
+            <span class="nav-text">Employees</span>
+        </a>
+
+        <a th:href="@{/departments}" class="nav-link">
+            <span class="nav-icon">▤</span>
+            <span class="nav-text">Departments</span>
+        </a>
+
+        <div class="sidebar-footer">
+            Employee Management System<br>
+            © 2026 EMS
+        </div>
+
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Header -->
+        <header class="topbar">
+
+            <div class="page-heading">
+                <h1>Employee Details</h1>
+                <p>View complete employee information and employment details.</p>
+            </div>
+
+            <a th:href="@{/employees}" class="back-btn">
+                ← Back to Employees
+            </a>
+
+        </header>
+
+        <!-- Employee Profile -->
+        <section class="profile-card">
+
+            <img th:if="${employee.photo != null and !employee.photo.isBlank()}"
+                 th:src="@{/uploads/employees/{filename}(filename=${employee.photo})}"
+                 alt="Employee Photo"
+                 class="profile-photo">
+
+            <div th:unless="${employee.photo != null and !employee.photo.isBlank()}"
+                 class="default-avatar"
+                 th:text="${#strings.substring(employee.firstName, 0, 1)}">
+            </div>
+
+            <div class="profile-info">
+
+                <h2 th:text="${employee.firstName + ' ' + employee.lastName}">
+                    Employee Name
+                </h2>
+
+                <p th:text="${employee.department}">
+                    Department
+                </p>
+
+                <span class="employee-badge">
+                    EMPLOYEE ID: #<span th:text="${employee.id}"></span>
+                </span>
+
+            </div>
+
+        </section>
+
+        <!-- Employee Details -->
+        <section class="details-card">
+
+            <div class="details-heading">
+                <h3>Employee Information</h3>
+                <p>Personal information and organization details.</p>
+            </div>
+
+            <!-- Personal Information -->
+            <div class="section-label">
+                <span>♙</span>
+                Personal Information
+            </div>
+
+            <div class="details-grid">
+
+                <div class="detail-item">
+                    <span class="detail-label">Employee ID</span>
+                    <span class="detail-value"
+                          th:text="${employee.id}"></span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">First Name</span>
+                    <span class="detail-value"
+                          th:text="${employee.firstName}"></span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Last Name</span>
+                    <span class="detail-value"
+                          th:text="${employee.lastName}"></span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Email Address</span>
+                    <span class="detail-value"
+                          th:text="${employee.email}"></span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Phone Number</span>
+                    <span class="detail-value"
+                          th:text="${employee.phone}"></span>
+                </div>
+
+            </div>
+
+            <!-- Employment Information -->
+            <div class="employment-section">
+
+                <div class="section-label">
+                    <span>▤</span>
+                    Employment Information
+                </div>
+
+                <div class="details-grid">
+
+                    <div class="detail-item">
+                        <span class="detail-label">Department</span>
+                        <span class="detail-value"
+                              th:text="${employee.department}"></span>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label">Salary</span>
+                        <span class="detail-value salary-value">
+                            ₹<span th:text="${employee.salary}"></span>
+                        </span>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label">Joining Date</span>
+                        <span class="detail-value"
+                              th:text="${employee.joiningDate != null ? #temporals.format(employee.joiningDate, 'dd MMM yyyy') : 'Not available'}">
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-actions">
+
+            <a th:href="@{/employees}" class="back-btn">
+                ← Back to Employee List
+            </a>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

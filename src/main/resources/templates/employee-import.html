@@ -1,0 +1,287 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Employees</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #F4F7FC;
+            color: #1E293B;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: auto;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            font-size: 26px;
+        }
+
+        .subtitle {
+            color: #64748B;
+            margin-bottom: 25px;
+        }
+
+        .upload-area {
+            border: 2px dashed #CBD5E1;
+            padding: 35px;
+            text-align: center;
+            border-radius: 10px;
+            background: #F8FAFC;
+            margin-bottom: 20px;
+        }
+
+        input[type="file"] {
+            margin-top: 18px;
+            width: 100%;
+        }
+
+        button, .back-btn {
+            display: inline-block;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 7px;
+            background: #2563EB;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        button:hover, .back-btn:hover {
+            background: #1D4ED8;
+        }
+
+        .back-btn {
+            background: #64748B;
+            margin-left: 8px;
+        }
+
+        .back-btn:hover {
+            background: #475569;
+        }
+
+        .error {
+            background: #FEE2E2;
+            color: #991B1B;
+            padding: 14px;
+            border-radius: 7px;
+            margin-bottom: 20px;
+        }
+
+        .success {
+            background: #DCFCE7;
+            color: #166534;
+            padding: 14px;
+            border-radius: 7px;
+            margin-bottom: 20px;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .summary-box {
+            padding: 18px;
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .summary-box h2 {
+            margin-bottom: 6px;
+            font-size: 25px;
+        }
+
+        .summary-box p {
+            color: #64748B;
+            font-size: 13px;
+        }
+
+        .error-list {
+            margin-top: 15px;
+            padding-left: 22px;
+        }
+
+        .error-list li {
+            margin-bottom: 10px;
+            color: #B91C1C;
+        }
+
+        .instructions {
+            line-height: 1.9;
+            color: #475569;
+        }
+
+        .instructions strong {
+            color: #1E293B;
+        }
+
+        @media (max-width: 600px) {
+            .summary {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h1>Import Employees</h1>
+
+        <p class="subtitle">
+            Upload an Excel file to add multiple employees at once.
+        </p>
+
+        <!-- Error Message -->
+        <div class="error"
+             th:if="${error}"
+             th:text="${error}">
+        </div>
+
+        <!-- Upload Form -->
+        <form th:action="@{/employees/import}"
+              method="post"
+              enctype="multipart/form-data">
+
+            <div class="upload-area">
+
+                <h3>Select Excel File</h3>
+
+                <p>Supported format: .xlsx</p>
+
+                <input type="file"
+                       name="file"
+                       accept=".xlsx"
+                       required>
+
+            </div>
+
+            <button type="submit">Import Employees</button>
+
+            <a th:href="@{/employees}" class="back-btn">
+                Back to Employees
+            </a>
+
+        </form>
+
+    </div>
+
+    <!-- Import Result -->
+    <div class="card" th:if="${result}">
+
+        <h2>Import Results</h2>
+
+        <div class="summary">
+
+            <div class="summary-box">
+                <h2 th:text="${result.totalRecords}">0</h2>
+                <p>Total Rows</p>
+            </div>
+
+            <div class="summary-box">
+                <h2 th:text="${result.successfulRecords}">0</h2>
+                <p>Successfully Imported</p>
+            </div>
+
+            <div class="summary-box">
+                <h2 th:text="${result.failedRecords}">0</h2>
+                <p>Failed Rows</p>
+            </div>
+
+        </div>
+
+		<div class="success"
+		     th:if="${result.successfulRecords > 0}">
+		    Employee import completed successfully.
+		</div>
+
+        <div th:if="${result.errors != null and !result.errors.isEmpty()}">
+
+            <h3>Import Errors</h3>
+
+            <ul class="error-list">
+                <li th:each="message : ${result.errors}"
+                    th:text="${message}">
+                </li>
+            </ul>
+
+        </div>
+
+    </div>
+
+    <!-- Excel Format Instructions -->
+    <div class="card">
+
+        <h2>Excel File Format</h2>
+
+        <p class="subtitle">
+            Arrange your Excel columns in the following order:
+        </p>
+
+        <div class="instructions">
+
+            <strong>Column 1:</strong> First Name<br>
+            <strong>Column 2:</strong> Last Name<br>
+            <strong>Column 3:</strong> Email<br>
+            <strong>Column 4:</strong> Phone<br>
+            <strong>Column 5:</strong> Department<br>
+            <strong>Column 6:</strong> Salary<br>
+            <strong>Column 7:</strong> Joining Date
+
+            <br><br>
+
+            <strong>Important:</strong>
+
+            <ul>
+                <li>Use the first row for column headings.</li>
+                <li>Enter employee records starting from the second row.</li>
+                <li>Use existing department names such as IT, HR or DEV.</li>
+                <li>Use a valid email address for each employee.</li>
+                <li>Enter joining dates in yyyy-MM-dd format or as Excel dates.</li>
+                <li>Upload only .xlsx files.</li>
+            </ul>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

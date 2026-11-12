@@ -1,0 +1,388 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Department | EMS</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            background: #F4F7FC;
+            color: #1E293B;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background: #14213D;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 28px 18px;
+            color: white;
+        }
+
+        .logo {
+            font-size: 23px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .logo span {
+            color: #60A5FA;
+        }
+
+        .nav-title {
+            font-size: 11px;
+            color: #94A3B8;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin: 20px 12px 12px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 13px 15px;
+            margin-bottom: 8px;
+            color: #CBD5E1;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #2563EB;
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            padding: 35px;
+        }
+
+        .page-header {
+            margin-bottom: 28px;
+        }
+
+        .page-header h1 {
+            font-size: 27px;
+            color: #14213D;
+            margin-bottom: 7px;
+        }
+
+        .page-header p {
+            color: #64748B;
+            font-size: 14px;
+        }
+
+        /* Form Card */
+        .form-card {
+            max-width: 750px;
+            background: white;
+            padding: 32px;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
+        }
+
+        .form-heading {
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .form-heading h2 {
+            font-size: 19px;
+            color: #14213D;
+            margin-bottom: 6px;
+        }
+
+        .form-heading p {
+            font-size: 13px;
+            color: #64748B;
+        }
+
+        .department-id {
+            display: inline-block;
+            background: #EFF6FF;
+            color: #2563EB;
+            padding: 7px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 23px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 9px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .required {
+            color: #DC2626;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #CBD5E1;
+            border-radius: 8px;
+            outline: none;
+            font-size: 14px;
+            color: #1E293B;
+            background: white;
+            transition: 0.3s;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: #2563EB;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #94A3B8;
+        }
+
+        textarea {
+            min-height: 130px;
+            resize: vertical;
+        }
+
+        .field-help {
+            color: #94A3B8;
+            font-size: 12px;
+            margin-top: 7px;
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .update-btn {
+            background: #2563EB;
+            color: white;
+            border: none;
+            padding: 13px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .update-btn:hover {
+            background: #1D4ED8;
+            transform: translateY(-1px);
+        }
+
+        .cancel-btn {
+            display: inline-block;
+            background: #F1F5F9;
+            color: #475569;
+            padding: 13px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .cancel-btn:hover {
+            background: #E2E8F0;
+        }
+
+        .footer {
+            text-align: center;
+            color: #94A3B8;
+            font-size: 12px;
+            margin-top: 28px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding: 18px;
+            }
+
+            .logo {
+                margin-bottom: 15px;
+            }
+
+            .nav-title {
+                display: none;
+            }
+
+            .nav-link {
+                display: inline-block;
+                margin: 3px;
+                padding: 10px;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px 14px;
+            }
+
+            .form-card {
+                padding: 22px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .update-btn,
+            .cancel-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+
+    <div class="logo">Employee<span>MS</span></div>
+
+    <div class="nav-title">Main Menu</div>
+
+    <a th:href="@{/dashboard}" class="nav-link">
+        Dashboard
+    </a>
+
+    <a th:href="@{/employees}" class="nav-link">
+        Employees
+    </a>
+
+    <a th:href="@{/departments}" class="nav-link active">
+        Departments
+    </a>
+
+    <div class="nav-title">Account</div>
+
+    <a th:href="@{/profile}" class="nav-link">
+        My Profile
+    </a>
+
+    <a th:href="@{/logout}" class="nav-link">
+        Logout
+    </a>
+
+</aside>
+
+<!-- Main Content -->
+<main class="main-content">
+
+    <div class="page-header">
+        <h1>Edit Department</h1>
+        <p>Update the department information and save your changes.</p>
+    </div>
+
+    <section class="form-card">
+
+        <div class="form-heading">
+            <h2>Department Information</h2>
+            <p>Modify the details of this department below.</p>
+
+            <span class="department-id">
+                Department ID:
+                <span th:text="${department.id}"></span>
+            </span>
+        </div>
+
+        <!-- Edit Department Form -->
+        <form th:action="@{/departments/update/{id}(id=${department.id})}"
+              th:object="${department}"
+              method="post">
+
+            <div class="form-group">
+
+                <label for="name">
+                    Department Name <span class="required">*</span>
+                </label>
+
+                <input type="text"
+                       id="name"
+                       th:field="*{name}"
+                       placeholder="Enter department name"
+                       required>
+
+                <p class="field-help">
+                    Update the department's official name.
+                </p>
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="description">
+                    Department Description
+                </label>
+
+                <textarea id="description"
+                          th:field="*{description}"
+                          placeholder="Enter department description"></textarea>
+
+                <p class="field-help">
+                    Update the responsibilities and purpose of this department.
+                </p>
+
+            </div>
+
+            <div class="button-group">
+
+                <button type="submit" class="update-btn">
+                    Update Department
+                </button>
+
+                <a th:href="@{/departments}" class="cancel-btn">
+                    Cancel
+                </a>
+
+            </div>
+
+        </form>
+
+    </section>
+
+    <div class="footer">
+        Employee Management System &copy; 2026
+    </div>
+
+</main>
+
+</body>
+</html>

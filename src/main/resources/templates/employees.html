@@ -1,0 +1,1034 @@
+
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+	
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employees | EMS</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <style>
+        :root {
+            --sidebar: #14213D;
+            --primary: #2563EB;
+            --primary-hover: #1D4ED8;
+            --background: #F4F7FC;
+            --white: #FFFFFF;
+            --text: #1E293B;
+            --muted: #64748B;
+            --border: #E2E8F0;
+            --success: #16A34A;
+            --danger: #DC2626;
+            --shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--text);
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 245px;
+            background: var(--sidebar);
+            color: white;
+            padding: 28px 18px;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 12px;
+            margin-bottom: 45px;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            background: var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .brand h2 {
+            font-size: 21px;
+            letter-spacing: 1px;
+        }
+
+        .nav-label {
+            color: #94A3B8;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            padding: 0 13px;
+            margin-bottom: 15px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 13px 15px;
+            margin-bottom: 8px;
+            border-radius: 9px;
+            color: #CBD5E1;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #263B60;
+            color: white;
+        }
+
+        .nav-link.active {
+            border-left: 3px solid #60A5FA;
+        }
+
+        .nav-icon {
+            font-size: 18px;
+            width: 22px;
+            text-align: center;
+        }
+
+		.sidebar-logout {
+		    width: 100%;
+		    background: transparent;
+		    border: none;
+		    cursor: pointer;
+		    text-align: left;
+		    font-family: inherit;
+		}
+
+		.sidebar-logout:hover {
+		    background: #dc2626;
+		    color: white;
+		}
+		
+        .sidebar-footer {
+            position: absolute;
+            bottom: 25px;
+            left: 18px;
+            right: 18px;
+            color: #94A3B8;
+            font-size: 12px;
+            text-align: center;
+            border-top: 1px solid #334155;
+            padding-top: 18px;
+        }
+
+        /* Main content */
+        .main-content {
+            margin-left: 245px;
+            width: calc(100% - 245px);
+            padding: 30px 35px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        .page-heading h1 {
+            font-size: 27px;
+            font-weight: 800;
+            margin-bottom: 7px;
+        }
+
+        .page-heading p {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .admin-badge {
+            background: #DBEAFE;
+            color: #1D4ED8;
+            padding: 9px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .logout-btn {
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--text);
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .logout-btn:hover {
+            background: #F1F5F9;
+        }
+
+        /* Page card */
+        .content-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .card-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 22px;
+        }
+
+        .card-heading h2 {
+            font-size: 19px;
+            font-weight: 700;
+        }
+
+        .card-heading p {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        .add-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary);
+            color: white;
+            padding: 11px 17px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: 0.2s;
+        }
+
+        .add-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .export-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #16A34A;
+            color: white;
+            padding: 11px 17px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: 0.2s;
+        }
+
+        .export-btn:hover {
+            background: #15803D;
+            transform: translateY(-1px);
+        }
+
+        .pdf-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #DC2626;
+            color: white;
+            padding: 11px 17px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: 0.2s;
+        }
+
+        .pdf-btn:hover {
+            background: #B91C1C;
+            transform: translateY(-1px);
+        }
+
+        .heading-actions {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* Filter section */
+        .filter-section {
+            background: #F8FAFC;
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .filter-title {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 13px;
+        }
+
+        .search-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .search-input,
+        .department-select,
+        .sort-select {
+            flex: 1;
+            min-width: 170px;
+            padding: 11px 13px;
+            border: 1px solid #CBD5E1;
+            border-radius: 8px;
+            background: white;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .search-input:focus,
+        .department-select:focus,
+        .sort-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+        }
+
+        .search-btn,
+        .clear-btn {
+            padding: 11px 18px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            border: none;
+        }
+
+        .search-btn {
+            background: var(--primary);
+            color: white;
+        }
+
+        .search-btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .clear-btn {
+            background: #E2E8F0;
+            color: #334155;
+        }
+
+        .clear-btn:hover {
+            background: #CBD5E1;
+        }
+
+        .results-info {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 18px 0;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .results-info strong {
+            color: var(--text);
+        }
+
+        /* Employee table */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+
+        table {
+            width: 100%;
+            min-width: 1050px;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        thead {
+            background: #F1F5F9;
+        }
+
+        th {
+            padding: 15px 13px;
+            color: #475569;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 13px;
+            font-size: 12px;
+            border-bottom: 1px solid #F1F5F9;
+            color: #334155;
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            transition: background 0.2s;
+        }
+
+        tbody tr:hover {
+            background: #F8FAFC;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .employee-photo,
+        .default-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #E2E8F0;
+        }
+
+        .default-avatar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #DBEAFE;
+            color: #1D4ED8;
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        .employee-name {
+            font-weight: 700;
+            color: #1E293B;
+        }
+
+        .department-badge {
+            display: inline-block;
+            background: #EFF6FF;
+            color: #1D4ED8;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .salary {
+            font-weight: 700;
+            color: #15803D;
+        }
+
+        /* Action buttons */
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .action-btn {
+            display: inline-block;
+            padding: 7px 10px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .view-btn {
+            background: #DBEAFE;
+            color: #1D4ED8;
+        }
+
+        .view-btn:hover {
+            background: #BFDBFE;
+        }
+
+        .edit-btn {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .edit-btn:hover {
+            background: #FDE68A;
+        }
+
+        .delete-btn {
+            background: #FEE2E2;
+            color: #B91C1C;
+        }
+
+        .delete-btn:hover {
+            background: #FECACA;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 45px 20px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .no-data-icon {
+            display: block;
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-top: 25px;
+        }
+
+        .pagination a {
+            min-width: 36px;
+            padding: 9px 12px;
+            text-align: center;
+            text-decoration: none;
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            color: #475569;
+            font-size: 12px;
+            font-weight: 600;
+            background: white;
+        }
+
+        .pagination a:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .pagination a.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .pagination a.disabled {
+            background: #F1F5F9;
+            color: #94A3B8;
+            pointer-events: none;
+        }
+
+        .page-info {
+            text-align: center;
+            margin-top: 14px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 900px) {
+            .sidebar {
+                width: 75px;
+                padding: 25px 10px;
+            }
+
+            .brand {
+                justify-content: center;
+                padding: 0;
+            }
+
+            .brand h2,
+            .nav-label,
+            .nav-text,
+            .sidebar-footer {
+                display: none;
+            }
+
+            .nav-link {
+                justify-content: center;
+                padding: 14px 5px;
+            }
+
+            .main-content {
+                margin-left: 75px;
+                width: calc(100% - 75px);
+                padding: 25px 20px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .main-content {
+                padding: 18px 12px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .page-heading h1 {
+                font-size: 22px;
+            }
+
+            .topbar-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .content-card {
+                padding: 16px;
+            }
+
+            .card-heading {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .filter-section {
+                padding: 13px;
+            }
+
+            .search-form {
+                flex-direction: column;
+            }
+
+            .search-input,
+            .department-select,
+            .sort-select,
+            .search-btn,
+            .clear-btn {
+                width: 100%;
+            }
+        }
+		
+		.import-btn {
+		    display: inline-block;
+		    padding: 11px 18px;
+		    background: #16A34A;
+		    color: white;
+		    text-decoration: none;
+		    border-radius: 7px;
+		    font-size: 14px;
+		    font-weight: 600;
+		}
+
+		.import-btn:hover {
+		    background: #15803D;
+		}
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">E</div>
+            <h2>EMS</h2>
+        </div>
+
+		<div class="nav-label">MAIN MENU</div>
+
+		<a th:href="@{/dashboard}" class="nav-link">
+		    <span class="nav-icon">▦</span>
+		    <span class="nav-text">Dashboard</span>
+		</a>
+
+		<a th:href="@{/employees}" class="nav-link active">
+		    <span class="nav-icon">♙</span>
+		    <span class="nav-text">Employees</span>
+		</a>
+
+		<a th:href="@{/departments}" class="nav-link">
+		    <span class="nav-icon">▤</span>
+		    <span class="nav-text">Departments</span>
+		</a>
+
+		<a th:href="@{/attendance}" class="nav-link">
+		    <span class="nav-icon">📅</span>
+		    <span class="nav-text">Attendance</span>
+		</a>
+
+		<a th:href="@{/audit-logs}" class="nav-link">
+		    <span class="nav-icon">📋</span>
+		    <span class="nav-text">Audit Logs</span>
+		</a>
+
+		<a th:href="@{/admin/create-hr}"
+		   class="nav-link"
+		   sec:authorize="hasRole('ADMIN')">
+		    <span class="nav-icon">👤</span>
+		    <span class="nav-text">Create HR Account</span>
+		</a>
+
+		<a th:href="@{/profile}" class="nav-link">
+		    <span class="nav-icon">👤</span>
+		    <span class="nav-text">My Profile</span>
+		</a>
+
+		<form th:action="@{/logout}" method="post" style="margin: 0;">
+		    <button type="submit" class="nav-link sidebar-logout">
+		        <span class="nav-icon">↪</span>
+		        <span class="nav-text">Logout</span>
+		    </button>
+		</form>
+
+		<div class="sidebar-footer">
+		    Employee Management System<br>
+		    © 2026 EMS
+		</div>
+
+		</aside>
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Header -->
+        <header class="topbar">
+
+            <div class="page-heading">
+                <h1>Employee Management</h1>
+                <p>Manage, search and organize your employees.</p>
+            </div>
+
+            <div class="topbar-right">
+                <span class="admin-badge">EMS Portal</span>
+
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="logout-btn">
+                        Logout ↗
+                    </button>
+                </form>
+            </div>
+
+        </header>
+
+        <!-- Employee Card -->
+        <section class="content-card">
+
+            <div class="card-heading">
+
+                <div>
+                    <h2>Employee Directory</h2>
+                    <p>View and manage all registered employees.</p>
+                </div>
+
+                <div class="heading-actions">
+                    <a th:href="@{/employees/export/excel(keyword=${keyword}, departmentId=${selectedDepartmentId}, sortBy=${sortBy})}"
+                       class="export-btn">
+                        <span aria-hidden="true">⇩</span> Export to Excel
+                    </a>
+
+                    <a th:href="@{/employees/export/pdf(keyword=${keyword}, departmentId=${selectedDepartmentId}, sortBy=${sortBy})}"
+                       class="pdf-btn">
+                        <span aria-hidden="true">⇩</span> Export to PDF
+                    </a>
+
+                    <a th:href="@{/employees/add}" class="add-btn">
+                        <span>＋</span> Add Employee
+                    </a>
+					
+					<a th:href="@{/employees/import}"
+					   class="import-btn"
+					   sec:authorize="hasRole('ADMIN')">
+					    <span>⬆</span> Import Excel
+					</a>
+					
+                </div>
+
+            </div>
+
+            <!-- Search and Filters -->
+            <div class="filter-section">
+
+                <div class="filter-title">Search & Filter Employees</div>
+
+                <form th:action="@{/employees}" method="get" class="search-form">
+
+                    <input
+                        type="text"
+                        name="keyword"
+                        class="search-input"
+                        placeholder="Search by name or department..."
+                        th:value="${keyword}">
+
+                    <select name="departmentId" class="department-select">
+
+                        <option value="">All Departments</option>
+
+                        <option th:each="dept : ${departments}"
+                                th:value="${dept.id}"
+                                th:text="${dept.name}"
+                                th:selected="${selectedDepartmentId != null and selectedDepartmentId == dept.id}">
+                        </option>
+
+                    </select>
+
+                    <select name="sortBy" class="sort-select">
+
+                        <option value="id"
+                                th:selected="${sortBy == 'id'}">
+                            Default Sorting
+                        </option>
+
+                        <option value="firstName"
+                                th:selected="${sortBy == 'firstName'}">
+                            First Name (A-Z)
+                        </option>
+
+                        <option value="salary,asc"
+                                th:selected="${sortBy == 'salary,asc'}">
+                            Salary (Low to High)
+                        </option>
+
+                        <option value="salary,desc"
+                                th:selected="${sortBy == 'salary,desc'}">
+                            Salary (High to Low)
+                        </option>
+
+                        <option value="joiningDate,desc"
+                                th:selected="${sortBy == 'joiningDate,desc'}">
+                            Joining Date (Newest First)
+                        </option>
+
+                    </select>
+
+                    <button type="submit" class="search-btn">
+                        Apply Filters
+                    </button>
+
+                    <a th:href="@{/employees}" class="clear-btn">
+                        Clear
+                    </a>
+
+                </form>
+
+            </div>
+
+            <!-- Results Information -->
+            <div class="results-info">
+
+                <span>
+                    Total Employees:
+                    <strong th:text="${totalItems}">0</strong>
+                </span>
+
+                <span th:if="${keyword != null and !keyword.isBlank()}">
+                    Search: <strong th:text="${keyword}"></strong>
+                </span>
+
+                <span th:if="${selectedDepartmentId != null}">
+                    Department filter applied
+                </span>
+
+            </div>
+
+            <!-- Employee Table -->
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Photo</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Department</th>
+                            <th>Salary</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr th:each="employee : ${employees}">
+
+                            <td th:text="${employee.id}"></td>
+
+                            <!-- Employee Photo -->
+                            <td>
+
+                                <img th:if="${employee.photo != null and !employee.photo.isBlank()}"
+                                     th:src="@{/uploads/employees/{filename}(filename=${employee.photo})}"
+                                     alt="Employee Photo"
+                                     class="employee-photo">
+
+                                <span th:unless="${employee.photo != null and !employee.photo.isBlank()}"
+                                      class="default-avatar"
+                                      th:text="${#strings.substring(employee.firstName, 0, 1)}">
+                                </span>
+
+                            </td>
+
+                            <td class="employee-name"
+                                th:text="${employee.firstName}">
+                            </td>
+
+                            <td th:text="${employee.lastName}"></td>
+
+                            <td th:text="${employee.email}"></td>
+
+                            <td th:text="${employee.phone}"></td>
+
+                            <td>
+                                <span class="department-badge"
+                                      th:text="${employee.department}">
+                                </span>
+                            </td>
+
+                            <td class="salary"
+                                th:text="${employee.salary}">
+                            </td>
+
+                            <!-- Actions -->
+                            <td>
+
+                                <div class="actions">
+
+                                    <a class="action-btn view-btn"
+                                       th:href="@{/employees/view/{id}(id=${employee.id})}">
+                                        View
+                                    </a>
+
+                                    <a class="action-btn edit-btn"
+                                       th:href="@{/employees/edit/{id}(id=${employee.id})}">
+                                        Edit
+                                    </a>
+
+                                    <!-- Delete: ADMIN only -->
+                                    <form th:if="${isAdmin}"
+                                          th:action="@{/employees/delete/{id}(id=${employee.id})}"
+                                          method="post">
+
+                                        <button type="submit"
+                                                class="action-btn delete-btn"
+                                                onclick="return confirm('Are you sure you want to delete this employee?')">
+                                            Delete
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        <!-- No Employees Found -->
+                        <tr th:if="${#lists.isEmpty(employees)}">
+
+                            <td colspan="9" class="no-data">
+                                <span class="no-data-icon">📂</span>
+                                No employees found.
+                                Try changing your search or filters.
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" th:if="${totalPages > 1}">
+
+                <a th:href="@{/employees(page=${currentPage - 1}, keyword=${keyword}, departmentId=${selectedDepartmentId}, sortBy=${sortBy})}"
+                   th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                    Previous
+                </a>
+
+                <a th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                   th:href="@{/employees(page=${i}, keyword=${keyword}, departmentId=${selectedDepartmentId}, sortBy=${sortBy})}"
+                   th:text="${i + 1}"
+                   th:classappend="${currentPage == i} ? 'active' : ''">
+                </a>
+
+                <a th:href="@{/employees(page=${currentPage + 1}, keyword=${keyword}, departmentId=${selectedDepartmentId}, sortBy=${sortBy})}"
+                   th:classappend="${currentPage + 1 >= totalPages} ? 'disabled' : ''">
+                    Next
+                </a>
+
+            </div>
+
+            <!-- Page Information -->
+            <p class="page-info" th:if="${totalPages > 0}">
+
+                Page
+                <strong th:text="${currentPage + 1}"></strong>
+                of
+                <strong th:text="${totalPages}"></strong>
+
+            </p>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Attendance | EMS</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <style>
+
+        :root {
+            --sidebar: #14213D;
+            --primary: #2563EB;
+            --background: #F4F7FC;
+            --white: #FFFFFF;
+            --text: #1E293B;
+            --muted: #64748B;
+            --border: #E2E8F0;
+            --success: #16A34A;
+            --danger: #DC2626;
+            --shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--text);
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+
+        .sidebar {
+            width: 245px;
+            background: var(--sidebar);
+            color: white;
+            padding: 28px 18px;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+			overflow-y: auto;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 12px;
+            margin-bottom: 45px;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            background: var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .brand h2 {
+            font-size: 21px;
+        }
+
+        .nav-label {
+            color: #94A3B8;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            padding: 0 13px;
+            margin-bottom: 15px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 13px 15px;
+            margin-bottom: 8px;
+            border-radius: 9px;
+            color: #CBD5E1;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #263B60;
+            color: white;
+        }
+
+        .nav-link.active {
+            border-left: 3px solid #60A5FA;
+        }
+
+		.sidebar-logout {
+		    width: 100%;
+		    background: transparent;
+		    border: none;
+		    cursor: pointer;
+		    text-align: left;
+		    font-family: inherit;
+		}
+
+		.sidebar-logout:hover {
+		    background: #dc2626;
+		    color: white;
+		}
+		
+        .nav-icon {
+            font-size: 18px;
+            width: 22px;
+            text-align: center;
+        }
+
+		.sidebar-footer {
+		    position: static;
+		    margin-top: 25px;
+		    color: #94A3B8;
+		    font-size: 12px;
+		    text-align: center;
+		    border-top: 1px solid #334155;
+		    padding-top: 18px;
+		}
+
+        /* MAIN CONTENT */
+
+        .main-content {
+            margin-left: 245px;
+            width: calc(100% - 245px);
+            padding: 30px 35px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        .page-heading h1 {
+            font-size: 27px;
+            font-weight: 800;
+            margin-bottom: 7px;
+        }
+
+        .page-heading p {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .admin-badge {
+            background: #DBEAFE;
+            color: #1D4ED8;
+            padding: 9px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .logout-btn {
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--text);
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* CARDS */
+
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 25px;
+        }
+
+        .card-heading {
+            margin-bottom: 22px;
+        }
+
+        .card-heading h2 {
+            font-size: 19px;
+            font-weight: 700;
+        }
+
+        .card-heading p {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        /* FORM */
+
+        .attendance-form {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        /* ATTENDANCE FILTERS */
+
+        .filter-form {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr)) auto auto;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .filter-btn {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .apply-filter-btn {
+            background: var(--primary);
+            color: white;
+        }
+
+        .apply-filter-btn:hover {
+            background: #1D4ED8;
+        }
+
+        .reset-filter-btn {
+            background: #E2E8F0;
+            color: #334155;
+        }
+
+        .reset-filter-btn:hover {
+            background: #CBD5E1;
+        }
+
+        @media (max-width: 1100px) {
+            .filter-form {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .filter-actions {
+                grid-column: 1 / -1;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #CBD5E1;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+            background: white;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .submit-btn {
+            padding: 12px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background: #1D4ED8;
+        }
+
+        /* ALERTS */
+
+        .alert {
+            padding: 13px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .success-alert {
+            background: #DCFCE7;
+            color: #15803D;
+        }
+
+        .error-alert {
+            background: #FEE2E2;
+            color: #B91C1C;
+        }
+
+        /* TABLE */
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+
+        table {
+            width: 100%;
+            min-width: 850px;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        thead {
+            background: #F1F5F9;
+        }
+
+        th {
+            padding: 15px 13px;
+            color: #475569;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 13px;
+            font-size: 12px;
+            border-bottom: 1px solid #F1F5F9;
+            white-space: nowrap;
+        }
+
+        tbody tr:hover {
+            background: #F8FAFC;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 11px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .present {
+            background: #DCFCE7;
+            color: #15803D;
+        }
+
+        .absent {
+            background: #FEE2E2;
+            color: #B91C1C;
+        }
+
+        .half_day {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .leave {
+            background: #DBEAFE;
+            color: #1D4ED8;
+        }
+
+        .action-btn {
+            padding: 7px 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .checkin-btn {
+            background: #DCFCE7;
+            color: #15803D;
+        }
+
+        .checkout-btn {
+            background: #DBEAFE;
+            color: #1D4ED8;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: var(--muted);
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 900px) {
+
+            .sidebar {
+                width: 75px;
+                padding: 25px 10px;
+            }
+
+            .brand {
+                justify-content: center;
+                padding: 0;
+            }
+
+            .brand h2,
+            .nav-label,
+            .nav-text,
+            .sidebar-footer {
+                display: none;
+            }
+
+            .nav-link {
+                justify-content: center;
+            }
+
+            .main-content {
+                margin-left: 75px;
+                width: calc(100% - 75px);
+                padding: 25px 20px;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .attendance-form {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .main-content {
+                padding: 18px 12px;
+            }
+
+            .content-card {
+                padding: 16px;
+            }
+
+            .full-width {
+                grid-column: auto;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">E</div>
+            <h2>EMS</h2>
+        </div>
+
+		<div class="nav-label">MAIN MENU</div>
+
+		<a th:href="@{/dashboard}" class="nav-link">
+		    <span class="nav-icon">▦</span>
+		    <span class="nav-text">Dashboard</span>
+		</a>
+
+		<a th:href="@{/employees}" class="nav-link">
+		    <span class="nav-icon">♙</span>
+		    <span class="nav-text">Employees</span>
+		</a>
+
+		<a th:href="@{/departments}" class="nav-link">
+		    <span class="nav-icon">▤</span>
+		    <span class="nav-text">Departments</span>
+		</a>
+
+		<a th:href="@{/attendance}" class="nav-link active">
+		    <span class="nav-icon">📅</span>
+		    <span class="nav-text">Attendance</span>
+		</a>
+
+		<a th:href="@{/attendance/reports}" class="nav-link">
+		    <span class="nav-icon">📊</span>
+		    <span class="nav-text">Attendance Reports</span>
+		</a>
+
+		<a th:href="@{/audit-logs}" class="nav-link">
+		    <span class="nav-icon">📋</span>
+		    <span class="nav-text">Audit Logs</span>
+		</a>
+
+		<a th:href="@{/admin/create-hr}"
+		   class="nav-link"
+		   sec:authorize="hasRole('ADMIN')">
+		    <span class="nav-icon">👤</span>
+		    <span class="nav-text">Create HR Account</span>
+		</a>
+
+		<div class="nav-label">ACCOUNT</div>
+
+		<a th:href="@{/profile}" class="nav-link">
+		    <span class="nav-icon">👤</span>
+		    <span class="nav-text">My Profile</span>
+		</a>
+
+		<form th:action="@{/logout}" method="post" style="margin: 0;">
+		    <button type="submit" class="nav-link sidebar-logout">
+		        <span class="nav-icon">↪</span>
+		        <span class="nav-text">Logout</span>
+		    </button>
+		</form>
+		
+        <div class="sidebar-footer">
+            Employee Management System<br>
+            © 2026 EMS
+        </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <div class="page-heading">
+                <h1>Attendance Management</h1>
+                <p>Mark and manage employee attendance.</p>
+            </div>
+
+			<div class="topbar-right">
+			    <span class="admin-badge">EMS Portal</span>
+			</div>
+
+        </header>
+
+        <!-- SUCCESS MESSAGE -->
+
+        <div th:if="${successMessage}"
+             class="alert success-alert"
+             th:text="${successMessage}">
+        </div>
+
+        <!-- ERROR MESSAGE -->
+
+        <div th:if="${errorMessage}"
+             class="alert error-alert"
+             th:text="${errorMessage}">
+        </div>
+
+        <!-- MARK ATTENDANCE FORM -->
+
+        <section class="content-card">
+
+            <div class="card-heading">
+
+                <h2>📝 Mark Employee Attendance</h2>
+
+                <p>Record daily attendance for registered employees.</p>
+
+            </div>
+
+            <form th:action="@{/attendance/mark}"
+                  method="post"
+                  class="attendance-form">
+
+                <div class="form-group">
+
+                    <label>Select Employee</label>
+
+                    <select name="employeeId"
+                            class="form-control"
+                            required>
+
+                        <option value="">Choose Employee</option>
+
+                        <option th:each="employee : ${employees}"
+                                th:value="${employee.id}"
+                                th:text="${employee.firstName + ' ' + employee.lastName + ' (ID: ' + employee.id + ')'}">
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Attendance Date</label>
+
+                    <input type="date"
+                           name="attendanceDate"
+                           class="form-control"
+                           th:value="${today}"
+                           required>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Attendance Status</label>
+
+                    <select name="status"
+                            class="form-control"
+                            required>
+
+                        <option value="">Select Status</option>
+
+                        <option th:each="status : ${attendanceStatuses}"
+                                th:value="${status}"
+                                th:text="${#strings.replace(status.name(), '_', ' ')}">
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Remarks</label>
+
+                    <input type="text"
+                           name="remarks"
+                           class="form-control"
+                           placeholder="Enter remarks (optional)">
+
+                </div>
+
+                <div class="form-group full-width">
+
+                    <button type="submit" class="submit-btn">
+                        ✓ Mark Attendance
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+        <!-- ATTENDANCE HISTORY FILTERS -->
+
+        <section class="content-card">
+
+            <div class="card-heading">
+                <h2>🔎 Filter Attendance History</h2>
+                <p>Find attendance records by employee or date range.</p>
+            </div>
+
+            <form th:action="@{/attendance}" method="get" class="filter-form">
+
+                <div class="form-group">
+                    <label for="filterEmployee">Employee</label>
+                    <select id="filterEmployee"
+                            name="employeeId"
+                            class="form-control">
+                        <option value="">All Employees</option>
+                        <option th:each="employee : ${employees}"
+                                th:value="${employee.id}"
+                                th:text="${employee.firstName + ' ' + employee.lastName + ' (ID: ' + employee.id + ')'}"
+                                th:selected="${selectedEmployeeId != null and selectedEmployeeId == employee.id}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="startDate">Start Date</label>
+                    <input type="date"
+                           id="startDate"
+                           name="startDate"
+                           class="form-control"
+                           th:value="${startDate}">
+                </div>
+
+                <div class="form-group">
+                    <label for="endDate">End Date</label>
+                    <input type="date"
+                           id="endDate"
+                           name="endDate"
+                           class="form-control"
+                           th:value="${endDate}">
+                </div>
+
+                <div class="filter-actions">
+                    <button type="submit" class="filter-btn apply-filter-btn">
+                        Apply Filters
+                    </button>
+
+                    <a th:href="@{/attendance}"
+                       class="filter-btn reset-filter-btn">
+                        Reset
+                    </a>
+                </div>
+
+            </form>
+
+        </section>
+
+        <!-- ATTENDANCE RECORDS -->
+
+        <section class="content-card">
+
+            <div class="card-heading">
+
+                <h2>📊 Attendance Records</h2>
+
+                <p>View all recorded employee attendance details.</p>
+
+            </div>
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>ID</th>
+                            <th>Employee ID</th>
+                            <th>Employee Name</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Check-In</th>
+                            <th>Check-Out</th>
+                            <th>Remarks</th>
+                            <th>Actions</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr th:each="record : ${attendanceRecords}">
+
+                            <td th:text="${record.id}"></td>
+
+                            <td th:text="${record.employee.id}"></td>
+
+                            <td th:text="${record.employee.firstName + ' ' + record.employee.lastName}">
+                            </td>
+
+                            <td th:text="${record.attendanceDate}"></td>
+
+                            <td>
+
+                                <span class="status"
+                                      th:classappend="${#strings.toLowerCase(record.status.name())}"
+                                      th:text="${#strings.replace(record.status.name(), '_', ' ')}">
+                                </span>
+
+                            </td>
+
+                            <td th:text="${record.checkIn != null ? record.checkIn : '-'}"></td>
+
+                            <td th:text="${record.checkOut != null ? record.checkOut : '-'}"></td>
+
+                            <td th:text="${record.remarks != null ? record.remarks : '-'}"></td>
+
+                            <td>
+
+                                <div style="display:flex; gap:6px;">
+
+                                    <form th:action="@{/attendance/check-in/{id}(id=${record.id})}"
+                                          method="post"
+                                          th:if="${record.checkIn == null}">
+
+                                        <button type="submit"
+                                                class="action-btn checkin-btn">
+                                            Check-In
+                                        </button>
+
+                                    </form>
+
+                                    <form th:action="@{/attendance/check-out/{id}(id=${record.id})}"
+                                          method="post"
+                                          th:if="${record.checkIn != null and record.checkOut == null}">
+
+                                        <button type="submit"
+                                                class="action-btn checkout-btn">
+                                            Check-Out
+                                        </button>
+
+                                    </form>
+
+                                    <span th:if="${record.checkOut != null}">
+                                        Completed
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        <tr th:if="${#lists.isEmpty(attendanceRecords)}">
+
+                            <td colspan="9" class="no-data">
+                                📂 No attendance records found.
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

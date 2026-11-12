@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Attendance Reports | EMS</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+		.sidebar {
+		    width: 245px;
+		    height: 100vh;
+		    position: fixed;
+		    background: #14213d;
+		    padding: 25px 18px;
+		    color: white;
+		    overflow-y: auto;
+		}
+        .brand {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 40px;
+        }
+
+        .menu-label {
+            color: #94a3b8;
+            font-size: 11px;
+            margin-bottom: 15px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 13px 15px;
+            margin-bottom: 8px;
+            color: #cbd5e1;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #2563eb;
+            color: white;
+        }
+
+		.sidebar-logout {
+		    display: block;
+		    width: 100%;
+		    padding: 13px 15px;
+		    margin-bottom: 8px;
+		    background: transparent;
+		    color: #cbd5e1;
+		    border: none;
+		    border-radius: 8px;
+		    text-align: left;
+		    font-size: 14px;
+		    cursor: pointer;
+		}
+
+		.sidebar-logout:hover {
+		    background: #dc2626;
+		    color: white;
+		}
+
+		.sidebar-footer {
+		    position: static;
+		    margin-top: 25px;
+		    padding-top: 18px;
+		    border-top: 1px solid #334155;
+		    color: #94a3b8;
+		    font-size: 12px;
+		    text-align: center;
+		}
+		
+        .main {
+            margin-left: 245px;
+            padding: 35px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .topbar h1 {
+            font-size: 26px;
+        }
+
+        .topbar p {
+            color: #64748b;
+            margin-top: 6px;
+            font-size: 13px;
+        }
+
+		.logout {
+		    background: #dc2626;
+		    color: white;
+		    padding: 10px 18px;
+		    border-radius: 8px;
+		    border: none;
+		    cursor: pointer;
+		    font-size: 13px;
+		}
+		
+        .filter-card,
+        .table-card {
+            background: white;
+            padding: 25px;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+            margin-bottom: 25px;
+        }
+
+        .filter-card h2,
+        .table-card h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        select,
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        button {
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        .generate-btn {
+            background: #2563eb;
+            color: white;
+        }
+
+        .reset-btn {
+            background: #e2e8f0;
+            color: #334155;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-left: 8px;
+            font-size: 13px;
+        }
+		
+		.export-btn {
+		    background: #16a34a;
+		    color: white;
+		    margin-left: 8px;
+		}
+
+		.export-btn:hover {
+		    background: #15803d;
+		}
+		
+		.pdf-btn {
+		    background: #dc2626;
+		    color: white;
+		    margin-left: 8px;
+		}
+
+		.pdf-btn:hover {
+		    background: #b91c1c;
+		}
+		
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 22px;
+            border-radius: 13px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+        }
+
+        .summary-card p {
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .summary-card h2 {
+            font-size: 27px;
+        }
+
+        .present { color: #16a34a; }
+        .absent { color: #dc2626; }
+        .halfday { color: #d97706; }
+        .leave { color: #2563eb; }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 650px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 13px;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #475569;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 30px;
+            color: #64748b;
+        }
+
+        @media(max-width: 900px) {
+            .sidebar {
+                width: 190px;
+            }
+
+            .main {
+                margin-left: 190px;
+                padding: 20px;
+            }
+
+            .summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media(max-width: 600px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .summary {
+                grid-template-columns: 1fr;
+            }
+        }
+		
+		.back-dashboard-btn {
+		    display: inline-block;
+		    margin-bottom: 15px;
+		    padding: 10px 18px;
+		    background: #2563eb;
+		    color: white;
+		    text-decoration: none;
+		    border-radius: 8px;
+		    font-size: 14px;
+		    font-weight: 600;
+		}
+
+		.back-dashboard-btn:hover {
+		    background: #1d4ed8;
+		}
+		
+    </style>
+</head>
+
+<body>
+
+	<!-- SIDEBAR -->
+	<div class="sidebar">
+
+	    <div class="brand">EMS</div>
+
+	    <div class="menu-label">MAIN MENU</div>
+
+	    <a th:href="@{/dashboard}">
+	        ▦ Dashboard
+	    </a>
+
+	    <a th:href="@{/employees}">
+	        👥 Employees
+	    </a>
+
+	    <a th:href="@{/departments}">
+	        ▤ Departments
+	    </a>
+
+	    <a th:href="@{/attendance}">
+	        📅 Attendance
+	    </a>
+
+	    <a th:href="@{/attendance/reports}" class="active">
+	        📊 Attendance Reports
+	    </a>
+
+	    <a th:href="@{/audit-logs}">
+	        📋 Audit Logs
+	    </a>
+
+	    <a th:href="@{/admin/create-hr}"
+	       sec:authorize="hasRole('ADMIN')">
+	        👤 Create HR Account
+	    </a>
+
+	    <div class="menu-label">ACCOUNT</div>
+
+	    <a th:href="@{/profile}">
+	        👤 My Profile
+	    </a>
+
+	    <form th:action="@{/logout}" method="post">
+	        <button type="submit" class="sidebar-logout">
+	            ↪ Logout
+	        </button>
+	    </form>
+
+	    <div class="sidebar-footer">
+	        Employee Management System<br>
+	        © 2026 EMS
+	    </div>
+
+	</div>
+<!-- MAIN CONTENT -->
+
+<div class="main">
+
+    <div class="topbar">
+
+        <div>
+			<a th:href="@{/dashboard}" class="back-dashboard-btn">
+			    ← Back to Dashboard
+			</a>
+            <h1>Attendance Reports</h1>
+            <p>View and analyze employee attendance records.</p>
+        </div>
+
+
+    </div>
+
+
+    <!-- FILTER SECTION -->
+
+    <div class="filter-card">
+
+        <h2>Filter Attendance Records</h2>
+
+        <form th:action="@{/attendance/reports}" method="get">
+
+            <div class="filter-grid">
+
+                <div>
+                    <label>Select Employee</label>
+
+					<select name="employeeId">
+					    <option value="">All Employees</option>
+
+					    <option th:each="employee : ${employees}"
+					            th:value="${employee.id}"
+					            th:text="${employee.firstName + ' ' + employee.lastName}"
+					            th:selected="${selectedEmployeeId != null and selectedEmployeeId == employee.id}">
+					    </option>
+					</select>
+					
+                </div>
+
+                <div>
+                    <label>Start Date</label>
+					<input type="date"
+					       name="startDate"
+					       th:value="${startDate}">
+                </div>
+
+                <div>
+                    <label>End Date</label>
+					<input type="date"
+					       name="endDate"
+					       th:value="${endDate}">
+                </div>
+
+            </div>
+
+            <button type="submit" class="generate-btn">
+                Generate Report
+            </button>
+
+            <a href="/attendance/reports" class="reset-btn">
+                Reset
+            </a>
+			
+			<button type="submit"
+			        class="export-btn"
+			        formaction="/attendance/reports/export/csv"
+			        formmethod="get">
+			    ↓ Export CSV
+			</button>
+			
+			<button type="button"
+			        class="pdf-btn"
+			        onclick="exportAttendancePDF()">
+			    ↓ Export PDF
+			</button>
+			
+        </form>
+
+    </div>
+
+
+	<!-- SUMMARY CARDS -->
+
+	<div class="summary">
+
+	    <div class="summary-card">
+	        <p>Total Records</p>
+	        <h2 th:text="${totalRecords}">0</h2>
+	    </div>
+
+	    <div class="summary-card">
+	        <p>Present</p>
+	        <h2 class="present" th:text="${presentCount}">0</h2>
+	    </div>
+
+	    <div class="summary-card">
+	        <p>Absent</p>
+	        <h2 class="absent" th:text="${absentCount}">0</h2>
+	    </div>
+
+	    <div class="summary-card">
+	        <p>Half Day</p>
+	        <h2 class="halfday" th:text="${halfDayCount}">0</h2>
+	    </div>
+
+	    <div class="summary-card">
+	        <p>Leave</p>
+	        <h2 class="leave" th:text="${leaveCount}">0</h2>
+	    </div>
+		
+		<div class="summary-card">
+		    <p>Attendance Percentage</p>
+		    <h2 style="color: #7c3aed;"
+		        th:text="${#numbers.formatDecimal(attendancePercentage, 1, 2) + '%'}">
+		        0%
+		    </h2>
+		</div>
+
+	</div>
+
+    <!-- ATTENDANCE TABLE -->
+
+    <div class="table-card">
+
+        <h2>Attendance Records</h2>
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Employee ID</th>
+                        <th>Employee Name</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Check In</th>
+                        <th>Check Out</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr th:each="record : ${attendanceRecords}">
+
+                        <td th:text="${record.employee.id}"></td>
+
+                        <td th:text="${record.employee.firstName + ' ' + record.employee.lastName}"></td>
+
+                        <td th:text="${record.attendanceDate}"></td>
+
+                        <td th:text="${record.status}"></td>
+
+                        <td th:text="${record.checkIn != null ? record.checkIn : '-'}"></td>
+
+                        <td th:text="${record.checkOut != null ? record.checkOut : '-'}"></td>
+
+                    </tr>
+
+                    <tr th:if="${#lists.isEmpty(attendanceRecords)}">
+                        <td colspan="6" class="empty">
+                            No attendance records found.
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+
+<script th:inline="none">
+
+function exportAttendancePDF() {
+
+    const { jsPDF } = window.jspdf;
+
+    const doc = new jsPDF();
+
+    // Report Title
+    doc.setFontSize(20);
+    doc.setTextColor(37, 99, 235);
+
+    doc.text("Attendance Report", 14, 20);
+
+    // Generated Date
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+
+    doc.text(
+        "Generated On: " + new Date().toLocaleDateString("en-IN"),
+        14,
+        28
+    );
+
+    // Attendance Summary
+    doc.setFontSize(14);
+    doc.setTextColor(30, 41, 59);
+
+    doc.text("Attendance Summary", 14, 40);
+
+    const summaryCards = document.querySelectorAll(".summary-card");
+
+    const summaryData = [];
+
+    summaryCards.forEach(card => {
+
+        const label = card.querySelector("p").innerText;
+        const value = card.querySelector("h2").innerText;
+
+        summaryData.push([label, value]);
+
+    });
+
+    doc.autoTable({
+        startY: 45,
+        head: [["Summary", "Value"]],
+        body: summaryData,
+        theme: "grid",
+        styles: {
+            fontSize: 10
+        }
+    });
+
+    // Attendance Records
+    doc.setFontSize(14);
+    doc.setTextColor(30, 41, 59);
+
+    doc.text(
+        "Attendance Records",
+        14,
+        doc.lastAutoTable.finalY + 15
+    );
+
+    const attendanceTable = document.querySelector(".table-card table");
+
+    doc.autoTable({
+        html: attendanceTable,
+        startY: doc.lastAutoTable.finalY + 20,
+        theme: "striped",
+        headStyles: {
+            fillColor: [37, 99, 235]
+        },
+        styles: {
+            fontSize: 9
+        }
+    });
+
+    // Download PDF
+    doc.save("attendance-report.pdf");
+
+}
+
+</script>
+
+
+</body>
+</html>

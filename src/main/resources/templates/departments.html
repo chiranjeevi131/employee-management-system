@@ -1,0 +1,549 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Department Management | EMS</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            background: #F4F7FC;
+            color: #1E293B;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background: #14213D;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 28px 18px;
+            color: white;
+        }
+
+        .logo {
+            font-size: 23px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .logo span {
+            color: #60A5FA;
+        }
+
+        .nav-title {
+            font-size: 11px;
+            color: #94A3B8;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin: 20px 12px 12px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 13px 15px;
+            margin-bottom: 8px;
+            color: #CBD5E1;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #2563EB;
+            color: white;
+        }
+		
+		.nav-icon {
+		    display: inline-block;
+		    width: 25px;
+		    margin-right: 8px;
+		    font-size: 16px;
+		    text-align: center;
+		}
+		
+		.sidebar-logout {
+		    width: 100%;
+		    background: transparent;
+		    border: none;
+		    cursor: pointer;
+		    text-align: left;
+		    font-family: inherit;
+		}
+
+		.sidebar-logout:hover {
+		    background: #dc2626;
+		    color: white;
+		}
+		
+		
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            padding: 35px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title h1 {
+            font-size: 27px;
+            font-weight: 700;
+            color: #14213D;
+        }
+
+        .page-title p {
+            color: #64748B;
+            margin-top: 6px;
+            font-size: 14px;
+        }
+
+        .role-badge {
+            background: #DBEAFE;
+            color: #1D4ED8;
+            padding: 9px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Messages */
+        .message {
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .success {
+            background: #DCFCE7;
+            color: #166534;
+            border: 1px solid #BBF7D0;
+        }
+
+        .error {
+            background: #FEE2E2;
+            color: #B91C1C;
+            border: 1px solid #FECACA;
+        }
+
+        /* Department Card */
+        .content-card {
+            background: white;
+            border-radius: 14px;
+            padding: 28px;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .card-header h2 {
+            font-size: 19px;
+            color: #14213D;
+        }
+
+        .card-header p {
+            font-size: 13px;
+            color: #64748B;
+            margin-top: 5px;
+        }
+
+        .add-btn {
+            display: inline-block;
+            background: #2563EB;
+            color: white;
+            padding: 11px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+
+        .add-btn:hover {
+            background: #1D4ED8;
+            transform: translateY(-1px);
+        }
+
+        /* Table */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 650px;
+        }
+
+        thead {
+            background: #F1F5F9;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            color: #475569;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        td {
+            padding: 17px 15px;
+            border-bottom: 1px solid #E2E8F0;
+            font-size: 14px;
+            color: #334155;
+        }
+
+        tbody tr:hover {
+            background: #F8FAFC;
+        }
+
+        .department-id {
+            background: #EFF6FF;
+            color: #2563EB;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .department-name {
+            font-weight: 600;
+            color: #14213D;
+        }
+
+        .description {
+            color: #64748B;
+            max-width: 300px;
+        }
+
+        /* Actions */
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .edit-btn {
+            display: inline-block;
+            color: #2563EB;
+            background: #EFF6FF;
+            padding: 8px 13px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .edit-btn:hover {
+            background: #DBEAFE;
+        }
+
+        .delete-btn {
+            background: #FEE2E2;
+            color: #DC2626;
+            border: none;
+            padding: 8px 13px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .delete-btn:hover {
+            background: #FECACA;
+        }
+
+        .view-badge {
+            background: #F1F5F9;
+            color: #64748B;
+            padding: 7px 11px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Empty State */
+        .no-data {
+            text-align: center;
+            padding: 45px 20px;
+            color: #64748B;
+            font-size: 14px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            color: #94A3B8;
+            font-size: 12px;
+            margin-top: 25px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding: 18px;
+            }
+
+            .logo {
+                margin-bottom: 15px;
+            }
+
+            .nav-title {
+                display: none;
+            }
+
+            .nav-link {
+                display: inline-block;
+                margin: 3px;
+                padding: 10px;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px 14px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                gap: 12px;
+                flex-direction: column;
+            }
+
+            .card-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .content-card {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+
+    <div class="logo">Employee<span>MS</span></div>
+
+	<div class="nav-title">Main Menu</div>
+
+	<a th:href="@{/dashboard}" class="nav-link">
+	    <span class="nav-icon">▦</span> Dashboard
+	</a>
+
+	<a th:href="@{/employees}" class="nav-link">
+	    <span class="nav-icon">👥</span> Employees
+	</a>
+
+	<a th:href="@{/departments}" class="nav-link active">
+	    <span class="nav-icon">▤</span> Departments
+	</a>
+
+	<a th:href="@{/attendance}" class="nav-link">
+	    <span class="nav-icon">📅</span> Attendance
+	</a>
+
+	<a th:href="@{/audit-logs}" class="nav-link">
+	    <span class="nav-icon">📋</span> Audit Logs
+	</a>
+
+	<a th:href="@{/admin/create-hr}"
+	   class="nav-link"
+	   sec:authorize="hasRole('ADMIN')">
+	    <span class="nav-icon">👤</span> Create HR Account
+	</a>
+
+	<div class="nav-title">Account</div>
+
+	<a th:href="@{/profile}" class="nav-link">
+	    <span class="nav-icon">👤</span> My Profile
+	</a>
+
+	<form th:action="@{/logout}" method="post">
+	    <button type="submit" class="nav-link sidebar-logout">
+	        <span class="nav-icon">↪</span> Logout
+	    </button>
+	</form>
+	
+	</aside>
+	<!-- Main Content -->
+<main class="main-content">
+
+    <div class="topbar">
+
+        <div class="page-title">
+            <h1>Department Management</h1>
+            <p>Manage and organize your organization's departments.</p>
+        </div>
+
+        <span class="role-badge"
+              sec:authorize="hasRole('ADMIN')">
+            ADMIN ACCESS
+        </span>
+
+        <span class="role-badge"
+              sec:authorize="hasRole('HR')">
+            HR ACCESS
+        </span>
+
+    </div>
+
+    <!-- Success Message -->
+    <div class="message success"
+         th:if="${success}"
+         th:text="${success}">
+    </div>
+
+    <!-- Error Message -->
+    <div class="message error"
+         th:if="${error}"
+         th:text="${error}">
+    </div>
+
+    <!-- Department Table Card -->
+    <section class="content-card">
+
+        <div class="card-header">
+
+            <div>
+                <h2>All Departments</h2>
+                <p>View and manage department information.</p>
+            </div>
+
+            <!-- Add Department - ADMIN ONLY -->
+            <a th:href="@{/departments/add}"
+               class="add-btn"
+               sec:authorize="hasRole('ADMIN')">
+                + Add Department
+            </a>
+
+        </div>
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Department Name</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr th:each="department : ${departments}">
+
+                        <td>
+                            <span class="department-id"
+                                  th:text="${department.id}">
+                            </span>
+                        </td>
+
+                        <td class="department-name"
+                            th:text="${department.name}">
+                        </td>
+
+                        <td class="description"
+                            th:text="${department.description}">
+                        </td>
+
+                        <td>
+
+                            <div class="actions">
+
+                                <!-- Edit - ADMIN ONLY -->
+                                <a sec:authorize="hasRole('ADMIN')"
+                                   class="edit-btn"
+                                   th:href="@{/departments/edit/{id}(id=${department.id})}">
+                                    Edit
+                                </a>
+
+                                <!-- Delete - ADMIN ONLY -->
+                                <form sec:authorize="hasRole('ADMIN')"
+                                      th:action="@{/departments/delete/{id}(id=${department.id})}"
+                                      method="post">
+
+                                    <button type="submit"
+                                            class="delete-btn"
+                                            onclick="return confirm('Are you sure you want to delete this department?')">
+                                        Delete
+                                    </button>
+
+                                </form>
+
+                                <!-- HR View Only -->
+                                <span sec:authorize="hasRole('HR')"
+                                      class="view-badge">
+                                    View Only
+                                </span>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    <!-- No Departments Found -->
+                    <tr th:if="${#lists.isEmpty(departments)}">
+                        <td colspan="4" class="no-data">
+                            No departments found!
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+    <div class="footer">
+        Employee Management System &copy; 2026
+    </div>
+
+</main>
+
+</body>
+</html>

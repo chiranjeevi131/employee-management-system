@@ -1,0 +1,774 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Employee | EMS</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <style>
+        :root {
+            --sidebar: #14213D;
+            --primary: #2563EB;
+            --primary-hover: #1D4ED8;
+            --background: #F4F7FC;
+            --white: #FFFFFF;
+            --text: #1E293B;
+            --muted: #64748B;
+            --border: #E2E8F0;
+            --success: #16A34A;
+            --shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 245px;
+            background: var(--sidebar);
+            color: white;
+            padding: 28px 18px;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 12px;
+            margin-bottom: 45px;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            background: var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .brand h2 {
+            font-size: 21px;
+            letter-spacing: 1px;
+        }
+
+        .nav-label {
+            color: #94A3B8;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            padding: 0 13px;
+            margin-bottom: 15px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 13px 15px;
+            margin-bottom: 8px;
+            border-radius: 9px;
+            color: #CBD5E1;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #263B60;
+            color: white;
+        }
+
+        .nav-link.active {
+            border-left: 3px solid #60A5FA;
+        }
+
+        .nav-icon {
+            font-size: 18px;
+            width: 22px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 25px;
+            left: 18px;
+            right: 18px;
+            color: #94A3B8;
+            font-size: 12px;
+            text-align: center;
+            border-top: 1px solid #334155;
+            padding-top: 18px;
+        }
+
+        /* Main content */
+        .main-content {
+            margin-left: 245px;
+            width: calc(100% - 245px);
+            padding: 30px 35px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            gap: 15px;
+        }
+
+        .page-heading h1 {
+            font-size: 27px;
+            font-weight: 800;
+            margin-bottom: 7px;
+        }
+
+        .page-heading p {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 11px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .back-btn:hover {
+            background: #F1F5F9;
+        }
+
+        /* Form card */
+        .form-card {
+            max-width: 1000px;
+            margin: auto;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .form-heading {
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .form-heading h2 {
+            font-size: 19px;
+            font-weight: 700;
+            margin-bottom: 7px;
+        }
+
+        .form-heading p {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .section-title span {
+            color: var(--primary);
+            font-size: 17px;
+        }
+
+        /* Form grid */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 22px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 9px;
+        }
+
+        .required {
+            color: #DC2626;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #CBD5E1;
+            border-radius: 8px;
+            background: white;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+        }
+
+        input::placeholder {
+            color: #94A3B8;
+        }
+
+        /* Photo section */
+        .photo-section {
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid var(--border);
+        }
+
+        .photo-upload-box {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            padding: 20px;
+            background: #F8FAFC;
+            border: 1px dashed #CBD5E1;
+            border-radius: 10px;
+        }
+
+        .photo-preview {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.10);
+            flex-shrink: 0;
+        }
+
+        .default-avatar {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            background: #DBEAFE;
+            color: #1D4ED8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            font-weight: 800;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.10);
+            flex-shrink: 0;
+        }
+
+        .photo-upload-content {
+            flex: 1;
+        }
+
+        .photo-upload-content h4 {
+            font-size: 13px;
+            margin-bottom: 7px;
+        }
+
+        .photo-upload-content p {
+            font-size: 11px;
+            color: var(--muted);
+            line-height: 1.7;
+            margin-bottom: 12px;
+        }
+
+        .file-input {
+            border: none;
+            padding: 0;
+            background: transparent;
+            font-size: 12px;
+        }
+
+        .file-input:focus {
+            box-shadow: none;
+        }
+
+        .current-photo-label {
+            display: inline-block;
+            background: #DCFCE7;
+            color: #15803D;
+            padding: 5px 9px;
+            border-radius: 5px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+
+        /* Buttons */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 32px;
+            padding-top: 22px;
+            border-top: 1px solid var(--border);
+        }
+
+        .cancel-btn,
+        .update-btn {
+            padding: 12px 22px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .cancel-btn {
+            background: white;
+            border: 1px solid var(--border);
+            color: #475569;
+        }
+
+        .cancel-btn:hover {
+            background: #F1F5F9;
+        }
+
+        .update-btn {
+            background: var(--primary);
+            border: none;
+            color: white;
+        }
+
+        .update-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 5px 12px rgba(37, 99, 235, 0.20);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .sidebar {
+                width: 75px;
+                padding: 25px 10px;
+            }
+
+            .brand {
+                justify-content: center;
+                padding: 0;
+            }
+
+            .brand h2,
+            .nav-label,
+            .nav-text,
+            .sidebar-footer {
+                display: none;
+            }
+
+            .nav-link {
+                justify-content: center;
+                padding: 14px 5px;
+            }
+
+            .main-content {
+                margin-left: 75px;
+                width: calc(100% - 75px);
+                padding: 25px 20px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .main-content {
+                padding: 18px 12px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .page-heading h1 {
+                font-size: 22px;
+            }
+
+            .form-card {
+                padding: 20px 15px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+
+            .photo-upload-box {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .form-actions {
+                flex-direction: column-reverse;
+            }
+
+            .cancel-btn,
+            .update-btn {
+                text-align: center;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">E</div>
+            <h2>EMS</h2>
+        </div>
+
+        <div class="nav-label">MAIN MENU</div>
+
+        <a th:href="@{/dashboard}" class="nav-link">
+            <span class="nav-icon">▦</span>
+            <span class="nav-text">Dashboard</span>
+        </a>
+
+        <a th:href="@{/employees}" class="nav-link active">
+            <span class="nav-icon">♙</span>
+            <span class="nav-text">Employees</span>
+        </a>
+
+        <a th:href="@{/departments}" class="nav-link">
+            <span class="nav-icon">▤</span>
+            <span class="nav-text">Departments</span>
+        </a>
+
+        <div class="sidebar-footer">
+            Employee Management System<br>
+            © 2026 EMS
+        </div>
+
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <div class="page-heading">
+                <h1>Edit Employee</h1>
+                <p>Update employee information and profile details.</p>
+            </div>
+
+            <a th:href="@{/employees}" class="back-btn">
+                ← Back to Employees
+            </a>
+
+        </header>
+
+        <!-- Edit Form -->
+        <section class="form-card">
+
+            <div class="form-heading">
+                <h2>Employee Information</h2>
+                <p>Modify the employee details below and save your changes.</p>
+            </div>
+
+            <form th:action="@{/employees/update/{id}(id=${employee.id})}"
+                  th:object="${employee}"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                <!-- Current Photo -->
+                <div class="photo-section"
+                     style="margin-top: 0; padding-top: 0; border-top: none;">
+
+                    <div class="section-title">
+                        <span>▣</span>
+                        Employee Profile Photo
+                    </div>
+
+                    <div class="photo-upload-box">
+
+                        <img th:if="${employee.photo != null and !employee.photo.isBlank()}"
+                             th:src="@{/uploads/employees/{filename}(filename=${employee.photo})}"
+                             id="photoPreview"
+                             alt="Employee Photo"
+                             class="photo-preview">
+
+                        <div th:unless="${employee.photo != null and !employee.photo.isBlank()}"
+                             id="defaultAvatar"
+                             class="default-avatar"
+                             th:text="${#strings.substring(employee.firstName, 0, 1)}">
+                        </div>
+
+                        <div class="photo-upload-content">
+
+                            <h4>Change Employee Photo</h4>
+
+                            <p>
+                                Your current profile photo is displayed here.
+                                Select a new image only if you want to replace it.
+                                Accepted formats: JPG, JPEG, PNG and WEBP.
+                                Maximum size: 5 MB.
+                            </p>
+
+                            <span class="current-photo-label">
+                                CURRENT PROFILE
+                            </span>
+
+                            <br><br>
+
+                            <input type="file"
+                                   id="photoFile"
+                                   name="photoFile"
+                                   class="file-input"
+                                   accept="image/jpeg,image/png,image/webp">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Personal Information -->
+                <div class="section-title" style="margin-top: 32px;">
+                    <span>♙</span>
+                    Personal Information
+                </div>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label for="firstName">
+                            First Name <span class="required">*</span>
+                        </label>
+
+                        <input type="text"
+                               id="firstName"
+                               th:field="*{firstName}"
+                               placeholder="Enter first name"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName">
+                            Last Name <span class="required">*</span>
+                        </label>
+
+                        <input type="text"
+                               id="lastName"
+                               th:field="*{lastName}"
+                               placeholder="Enter last name"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">
+                            Email Address <span class="required">*</span>
+                        </label>
+
+                        <input type="email"
+                               id="email"
+                               th:field="*{email}"
+                               placeholder="example@company.com"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">
+                            Phone Number <span class="required">*</span>
+                        </label>
+
+                        <input type="text"
+                               id="phone"
+                               th:field="*{phone}"
+                               placeholder="Enter phone number"
+                               required>
+                    </div>
+
+                </div>
+
+                <!-- Employment Information -->
+                <div class="section-title" style="margin-top: 32px;">
+                    <span>▤</span>
+                    Employment Information
+                </div>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label for="department">
+                            Department <span class="required">*</span>
+                        </label>
+
+                        <select id="department"
+                                th:field="*{departmentEntity.id}"
+                                required>
+
+                            <option value="">-- Select Department --</option>
+
+                            <option th:each="dept : ${departments}"
+                                    th:value="${dept.id}"
+                                    th:text="${dept.name}">
+                            </option>
+
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="salary">
+                            Salary <span class="required">*</span>
+                        </label>
+
+                        <input type="number"
+                               id="salary"
+                               step="0.01"
+                               th:field="*{salary}"
+                               min="0"
+                               placeholder="Enter salary"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="joiningDate">
+                            Joining Date <span class="required">*</span>
+                        </label>
+
+                        <input type="date"
+                               id="joiningDate"
+                               name="joiningDate"
+                               th:value="${employee.joiningDate != null ? #temporals.format(employee.joiningDate, 'yyyy-MM-dd') : ''}"
+                               required>
+                    </div>
+
+                </div>
+
+                <!-- Actions -->
+                <div class="form-actions">
+
+                    <a th:href="@{/employees}" class="cancel-btn">
+                        Cancel
+                    </a>
+
+                    <button type="submit" class="update-btn">
+                        Update Employee →
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+</div>
+
+<!-- Photo Preview -->
+<script>
+    const photoInput = document.getElementById("photoFile");
+    const photoPreview = document.getElementById("photoPreview");
+    const defaultAvatar = document.getElementById("defaultAvatar");
+
+    photoInput.addEventListener("change", function () {
+
+        const file = this.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        const allowedTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+        ];
+
+        if (!allowedTypes.includes(file.type)) {
+            alert("Please select a JPG, PNG or WEBP image.");
+            this.value = "";
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            alert("Image size must not exceed 5 MB.");
+            this.value = "";
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+
+            if (photoPreview) {
+                photoPreview.src = event.target.result;
+            } else {
+                const newImage = document.createElement("img");
+
+                newImage.src = event.target.result;
+                newImage.id = "photoPreview";
+                newImage.className = "photo-preview";
+                newImage.alt = "Employee Photo Preview";
+
+                defaultAvatar.replaceWith(newImage);
+            }
+        };
+
+        reader.readAsDataURL(file);
+    });
+</script>
+
+</body>
+</html>
