@@ -910,10 +910,10 @@
                             <!-- Employee Photo -->
                             <td>
 
-                                <img th:if="${employee.photo != null and !employee.photo.isBlank()}"
-                                     th:src="@{/uploads/employees/{filename}(filename=${employee.photo})}"
-                                     alt="Employee Photo"
-                                     class="employee-photo">
+								<img th:if="${employee.photo != null and !employee.photo.isBlank()}"
+								     th:src="${employee.photo}"
+								     alt="Employee Photo"
+								     class="employee-photo">
 
                                 <span th:unless="${employee.photo != null and !employee.photo.isBlank()}"
                                       class="default-avatar"

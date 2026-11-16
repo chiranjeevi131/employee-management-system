@@ -541,11 +541,11 @@
 
                     <div class="photo-upload-box">
 
-                        <img th:if="${employee.photo != null and !employee.photo.isBlank()}"
-                             th:src="@{/uploads/employees/{filename}(filename=${employee.photo})}"
-                             id="photoPreview"
-                             alt="Employee Photo"
-                             class="photo-preview">
+						<img th:if="${employee.photo != null and !employee.photo.isBlank()}"
+						     th:src="${employee.photo}"
+						     id="photoPreview"
+						     alt="Employee Photo"
+						     class="photo-preview">
 
                         <div th:unless="${employee.photo != null and !employee.photo.isBlank()}"
                              id="defaultAvatar"

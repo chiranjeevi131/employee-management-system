@@ -454,10 +454,10 @@
         <!-- Employee Profile -->
         <section class="profile-card">
 
-            <img th:if="${employee.photo != null and !employee.photo.isBlank()}"
-                 th:src="@{/uploads/employees/{filename}(filename=${employee.photo})}"
-                 alt="Employee Photo"
-                 class="profile-photo">
+			<img th:if="${employee.photo != null and !employee.photo.isBlank()}"
+			     th:src="${employee.photo}"
+			     alt="Employee Photo"
+			     class="profile-photo">
 
             <div th:unless="${employee.photo != null and !employee.photo.isBlank()}"
                  class="default-avatar"
